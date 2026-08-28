@@ -11,8 +11,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.js"></script>
 <link href='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css' rel='stylesheet'/>
 <script src='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js'></script>
 <style>
@@ -583,46 +581,9 @@ body {
 .sub-icon svg { width: 14px; height: 14px; }
 
 
-/* ── SCALE BAR ── */
 /* On mobile map-outer goes to bottom:0 — push controls above the 32px statusbar */
 .leaflet-bottom { padding-bottom: 52px !important; }
 .leaflet-bottom-left { padding-bottom: 52px !important; }
-.leaflet-control-scale {
-  display: block !important; visibility: visible !important;
-  margin-bottom: 6px !important; margin-left: 10px !important;
-  z-index: 1000 !important; position: relative !important;
-}
-.leaflet-control-scale-line {
-  background: var(--dark) !important;
-  color: var(--gray1) !important;
-  border: 1px solid var(--border2) !important;
-  border-top: 2px solid var(--gray2) !important;
-  font-family: var(--mono) !important;
-  font-size: 11px !important;
-  letter-spacing: 0.05em !important;
-  padding: 3px 8px !important;
-  white-space: nowrap;
-  line-height: 1.6;
-}
-.leaflet-control-scale-line:not(:first-child) { display: none; }
-
-/* ── MINIMAP ── */
-.leaflet-control-minimap {
-  border: 1px solid var(--border2) !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.5) !important;
-  border-radius: 0 !important;
-  margin-right: 10px !important;
-  margin-bottom: 50px !important;
-}
-.leaflet-control-minimap-toggle-display {
-  background: var(--dark) !important;
-  border: 1px solid var(--border2) !important;
-  border-radius: 0 !important;
-  width: 18px !important;
-  height: 18px !important;
-  bottom: 0 !important;
-  right: 0 !important;
-}
 
 /* ── NORTH ARROW ── */
 #north-arrow {
@@ -752,18 +713,6 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
 .btn-3d.active { background: var(--red); border-color: var(--red); color: #fff; }
 
 /* ── MAPLIBRE overrides ── */
-/* Push MapLibre bottom-left controls (scale) above the 32px status bar */
-.maplibregl-ctrl-bottom-left { padding-bottom: 42px !important; }
-.maplibregl-ctrl-scale {
-  background: var(--dark) !important;
-  color: var(--gray1) !important;
-  border: 1px solid var(--border2) !important;
-  border-top: 2px solid var(--gray2) !important;
-  font-family: var(--mono) !important;
-  font-size: 11px !important;
-  letter-spacing: 0.05em !important;
-  padding: 3px 8px !important;
-}
 .maplibregl-ctrl-attrib {
   background: var(--dark) !important; color: var(--gray2) !important;
   font-size: 9px !important;
@@ -1075,18 +1024,6 @@ body.mode-3d #bm-ctrl { right: auto !important; left: 10px !important; }
   color: var(--white) !important;
 }
 
-/* ── SCALE BAR: glass pill, sits above the floating footer ── */
-.leaflet-control-scale { bottom: 60px !important; }
-.leaflet-control-scale-line {
-  background: rgba(255,255,255,0.12) !important;
-  backdrop-filter: blur(16px) saturate(170%);
-  -webkit-backdrop-filter: blur(16px) saturate(170%);
-  border: 1px solid rgba(255,255,255,0.22) !important;
-  border-top: 1px solid rgba(255,255,255,0.22) !important;
-  border-radius: 999px !important;
-  color: var(--white) !important;
-}
-
 /* ── 3D NAV CONTROL: glass circles, below header ── */
 .maplibregl-ctrl-top-right {
   top: 74px !important; right: 10px !important;
@@ -1103,13 +1040,6 @@ body.mode-3d #bm-ctrl { right: auto !important; left: 10px !important; }
   -webkit-backdrop-filter: blur(16px) saturate(170%);
   border: 1px solid rgba(255,255,255,0.22) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.3) !important;
-}
-.maplibregl-ctrl-bottom-left { bottom: 60px !important; }
-.maplibregl-ctrl-scale {
-  background: rgba(255,255,255,0.12) !important;
-  border: 1px solid rgba(255,255,255,0.22) !important;
-  border-radius: 999px !important;
-  color: var(--white) !important;
 }
 .maplibregl-ctrl-attrib { background: transparent !important; }
 
@@ -1129,7 +1059,6 @@ body.bm-maps #btn-3d,
 body.bm-maps .hdr-icon-btn,
 body.bm-maps #bm-ctrl,
 body.bm-maps #north-arrow,
-body.bm-maps .leaflet-control-scale-line,
 body.bm-maps .leaflet-control-zoom a,
 body.bm-maps .maplibregl-ctrl-top-right button {
   background: rgba(200,200,200,0.12) !important;
@@ -1527,21 +1456,6 @@ const s2Tiles    = L.tileLayer('https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless
 });
 
 satellite.addTo(map);
-L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);
-
-// ── MINIMAP ──
-try {
-  const miniTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'',maxZoom:19,maxNativeZoom:16});
-  new L.Control.MiniMap(miniTile,{
-    position:'bottomright',
-    width:160, height:120,
-    zoomLevelOffset:-5,
-    toggleDisplay:true,
-    minimized:false,
-    aimingRectOptions:{color:'#EE4238',weight:2,opacity:0.9,fillOpacity:0.05},
-    shadowRectOptions:{color:'#1c1a18',weight:1,opacity:0.5,fillOpacity:0.1}
-  }).addTo(map);
-} catch(e) { console.warn('MiniMap unavailable:', e); }
 
 // ── RENDER SITES ──
 function makeClusterIcon(cluster){
@@ -2226,7 +2140,6 @@ function init3D() {
   setTimeout(() => clearInterval(_fallback), 8000);
 
   glMap.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-right');
-  glMap.addControl(new maplibregl.ScaleControl({unit:'metric'}),'bottom-left');
 }
 
 // ── LANGUAGE SWITCHER ──
@@ -2279,14 +2192,19 @@ function mobOpenSearch() {
   var logo = document.getElementById('mob-logo');
   if (!sb) return;
   var wasOpen = sb.classList.contains('mob-open');
-  if (!wasOpen) {
-    sb.classList.add('mob-open');
-    if (logo) logo.classList.add('mob-open');
+  if (wasOpen) {
+    var inp0 = document.getElementById('mob-search-input');
+    if (inp0) inp0.blur();
+    sb.classList.remove('mob-open');
+    if (logo) logo.classList.remove('mob-open');
+    return;
   }
+  sb.classList.add('mob-open');
+  if (logo) logo.classList.add('mob-open');
   setTimeout(function(){
     var inp = document.getElementById('mob-search-input');
     if (inp) inp.focus();
-  }, wasOpen ? 0 : 220);
+  }, 220);
 }
 
 /* ── MOBILE: Layers icon opens the panel scrolled to the layer list ── */
@@ -2294,10 +2212,14 @@ function mobOpenLayers() {
   var sb   = document.getElementById('sidebar');
   var logo = document.getElementById('mob-logo');
   if (!sb) return;
-  if (!sb.classList.contains('mob-open')) {
-    sb.classList.add('mob-open');
-    if (logo) logo.classList.add('mob-open');
+  var wasOpen = sb.classList.contains('mob-open');
+  if (wasOpen) {
+    sb.classList.remove('mob-open');
+    if (logo) logo.classList.remove('mob-open');
+    return;
   }
+  sb.classList.add('mob-open');
+  if (logo) logo.classList.add('mob-open');
   var inp = document.getElementById('mob-search-input');
   if (inp) inp.blur();
   var list = document.getElementById('tab-layers');
