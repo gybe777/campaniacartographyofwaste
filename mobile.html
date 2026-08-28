@@ -918,7 +918,7 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
       <!-- 1. SITI CONTAMINATI (expandable with sub-categories) -->
       <div class="layer-section" id="section-siti">
         <div class="layer-row active" id="row-siti" onclick="toggleExpand('siti')">
-          <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#EE4238" opacity="0.9"/></svg></div>
+          <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#eab308" opacity="0.9"/></svg></div>
           <span class="lr-name" data-i18n="layer_siti">Siti Contaminati Prioritari</span>
           <span class="lr-count" id="cnt-siti">241</span>
           <span class="lr-chevron">›</span>
@@ -989,7 +989,7 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
       <!-- 6. SVERSAMENTI ABUSIVI -->
       <div class="layer-section">
         <div class="layer-row" id="row-sver" onclick="toggleLayer('sver', this)">
-          <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="5" fill="#eab308" fill-opacity="0.4" stroke="#eab308" stroke-width="1.2"/></svg></div>
+          <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#dc2626" fill-opacity="0.4" stroke="#dc2626" stroke-width="1.2"/></svg></div>
           <span class="lr-name" data-i18n="layer_sver">Sversamenti Abusivi</span>
           <span class="lr-count">276</span>
           <span class="lr-chevron">›</span>
@@ -1267,9 +1267,8 @@ function getCat(type){return TYPE_TO_CAT[type]||'Dismesso / Ex-Industriale';}
 function getColor(type){const cat=getCat(type);return(CATEGORIES[cat]||{color:'#888'}).color;}
 const hiddenCats=new Set();
 SITES.forEach((s,i)=>{
-  const col=getColor(s['Site Type']);
   const m=L.marker([s.lat,s.lon],{
-    icon:L.divIcon({className:'',html:'<svg width="10" height="12" viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg" style="display:block"><polygon points="5,12 0,0 10,0" fill="#EE4238" opacity="0.8"/></svg>',iconSize:[10,12],iconAnchor:[5,6]})
+    icon:L.divIcon({className:'',html:'<svg width="10" height="12" viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg" style="display:block"><polygon points="5,12 0,0 10,0" fill="#eab308" opacity="0.8"/></svg>',iconSize:[10,12],iconAnchor:[5,6]})
   }).bindPopup(()=>sitePopupHTML(s),{maxWidth:400});
   m.addTo(markersLg);
   mByIdx.set(i,m);
@@ -1328,8 +1327,9 @@ const sverLg=L.layerGroup();
 let sverOn=true;
 SVERSAMENTI.forEach(v=>{
   const cleared=(v.props.stato==='Smaltito');
-  const col=cleared?'#22c55e':'#eab308';
-  L.circleMarker([v.lat,v.lon],{radius:5,color:col,weight:1.5,fillColor:col,fillOpacity:0.6})
+  L.marker([v.lat,v.lon],{
+    icon:L.divIcon({className:'',html:'<svg width="10" height="12" viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg" style="display:block"><polygon points="5,12 0,0 10,0" fill="#dc2626" opacity="'+(cleared?0.4:0.8)+'"/></svg>',iconSize:[10,12],iconAnchor:[5,6]})
+  })
     .bindPopup(()=>'<div class="popup-wrap"><div class="popup-title">'+T('p_sver')+'</div>'
       +'<div class="popup-row"><span class="popup-label">'+T('p_comune')+'</span><span>'+(v.props.comune||'')+'</span></div>'
       +'<div class="popup-row"><span class="popup-label">'+T('p_provincia')+'</span><span>'+(v.props.provincia||'')+'</span></div>'
@@ -1352,7 +1352,7 @@ function buildCatRows(){
     const row=document.createElement('div');
     row.className='sub-row'+(hiddenCats.has(cat)?' off':'');
     row.dataset.cat=cat;
-    row.innerHTML='<div class="sub-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="'+info.color+'" opacity="0.9"/></svg></div>'
+    row.innerHTML='<div class="sub-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#eab308" opacity="0.9"/></svg></div>'
       +'<span class="sub-name">'+catName(cat)+'</span>'
       +'<span class="sub-count">'+count+'</span>';
     row.onclick=e=>{
@@ -1682,7 +1682,7 @@ function addTerrainAndData() {
     }))};
     glMap.addSource('sver',{type:'geojson',data:sverFC});
     glMap.addLayer({id:'sver-pts',type:'circle',source:'sver',
-      paint:{'circle-radius':4,'circle-color':['case',['==',['get','stato'],'Smaltito'],'#22c55e','#eab308'],'circle-opacity':0.5,'circle-stroke-width':1,'circle-stroke-color':'rgba(255,255,255,0.4)'}});
+      paint:{'circle-radius':4,'circle-color':'#dc2626','circle-opacity':0.5,'circle-stroke-width':1,'circle-stroke-color':'rgba(255,255,255,0.4)'}});
   }
   if (!glMap.getSource('sites3d')) {
     const sitesFC={type:'FeatureCollection',features:SITES.map(s=>({
