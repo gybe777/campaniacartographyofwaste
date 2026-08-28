@@ -622,7 +622,7 @@ body {
 }
 #info-panel.open { display: flex; }
 .info-hdr {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: flex-end;
   padding: 10px 12px 8px; border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -668,8 +668,8 @@ body {
   color: var(--gray2); margin-bottom: 10px;
 }
 .info-text {
-  font-family: var(--font); font-size: 9.5px; color: var(--gray1);
-  line-height: 1.65;
+  font-family: var(--font); font-size: 15px; color: var(--gray1);
+  line-height: 1.6;
 }
 /* ── 3D ROTATE HINT ── */
 #rotate-hint {
@@ -911,21 +911,11 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
 
   <div id="info-panel">
     <div class="info-hdr">
-      <strong>Wasting the Land</strong>
       <button class="info-close" onclick="toggleInfo()">×</button>
     </div>
     <div class="info-body">
 
       <div class="info-section">
-        <div class="info-author">Antonio del Giudice</div>
-        <div class="info-tag">PhD Research · Royal College of Art</div>
-        <a class="info-link" href="https://pgr.rca-architecture.com/people/antonio-del-giudice" target="_blank">pgr.rca-architecture.com ↗</a>
-      </div>
-
-      <div class="info-section">
-        <div class="info-section-title" data-i18n="section_abstract">Abstract</div>
-        <div class="info-paper-title">Wasting the Land</div>
-        <div class="info-paper-sub">Commoning, grassroots movements, and the struggle against wasting relationships in the Campania region, Italy.</div>
         <div class="info-text">This research examines Italy’s prolonged and complex waste crisis and the marginalisation of the communities most affected by it, conditions that have given rise to grassroots movements advocating for environmental justice. The project seeks to co-produce alternative representational methods for commoning processes (Federici, 2019) and new territorial strategies by working closely with environmental grassroots movements and situated agroecological practices in Campania. Through these collaborations, it aims to develop a counter-narrative to state and corporate neglect, one that is rooted in collective action and a profound connection to the land. In doing so, it demonstrates how community-led responses can offer more sustainable and equitable alternatives to top-down environmental policies.</div>
       </div>
 
@@ -939,6 +929,7 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
 
       <div class="info-section">
         <div class="info-text">Ultimately, the project aims to strengthen and support the ongoing efforts of communities on the front lines of socio-environmental conflict in the Campania region. Its collaborative methodology is designed to ensure that the research produces not only academic knowledge but also practical tools and strategies that are directly relevant and valuable to the communities involved.</div>
+        <a class="info-link" href="https://pgr.rca-architecture.com/people/antonio-del-giudice" target="_blank" style="display:inline-block;margin-top:10px;">pgr.rca-architecture.com ↗</a>
       </div>
 
     </div>
@@ -1083,9 +1074,9 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
   <!-- Rotation hint (3D mode) -->
   <div id="rotate-hint" data-i18n="rotate_hint">Drag to pan &nbsp;·&nbsp; Right-click drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
   <div id="bm-ctrl">
-    <button class="bm-btn active" id="bm-light" onclick="setBasemap('light')">LIGHT</button>
-    <button class="bm-btn" id="bm-osm"   onclick="setBasemap('osm')">OSM</button>
-    <button class="bm-btn" id="bm-sat"   onclick="setBasemap('sat')">SAT</button>
+    <button class="bm-btn active" id="bm-sat"   onclick="setBasemap('sat')">SAT</button>
+    <button class="bm-btn" id="bm-dark"  onclick="setBasemap('dark')">DARK</button>
+    <button class="bm-btn" id="bm-maps"  onclick="setBasemap('maps')">MAPS</button>
   </div>
   <div id="north-arrow">
     <svg viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
@@ -1110,10 +1101,8 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
 <!-- STATUS BAR -->
 <div id="statusbar">
   <div class="sb-dot"></div>
-  <div class="sb-item" data-i18n="sb_arpac">ARPAC Piano Regionale di Bonifica 2018</div>
-  <span id="sb-vis" style="display:none">241</span>
+  <div class="sb-item"><span data-i18n="sb_visible">Siti visibili:</span> <span id="sb-vis">241</span></div>
   <div class="sb-spacer"></div>
-  <div class="sb-item" data-i18n="sb_province">Provincia CE / NA / SA</div>
 </div>
 
 <script>
@@ -1175,9 +1164,7 @@ const I18N = {
     search_placeholder:'Cerca per nome, comune, contaminante...',
     info_title:'Info sul progetto',
     rotate_hint:'Trascina per spostare &nbsp;·&nbsp; Clic destro per ruotare &nbsp;·&nbsp; Rotella per zoom',
-    sb_arpac:'ARPAC Piano Regionale di Bonifica 2018',
     sb_visible:'Siti visibili:',
-    sb_province:'Provincia CE / NA / SA',
     section_abstract:'Abstract', section_bio:'Bio',
     p_comune:'Comune', p_tipo:'Tipo', p_codice:'Codice',
     p_suolo:'Suolo', p_acqua:'Acqua', p_stato:'Stato',
@@ -1219,9 +1206,7 @@ const I18N = {
     search_placeholder:'Search by name, municipality, contaminant...',
     info_title:'Project info',
     rotate_hint:'Drag to pan &nbsp;·&nbsp; Right-click drag to rotate &nbsp;·&nbsp; Scroll to zoom',
-    sb_arpac:'ARPAC Regional Remediation Plan 2018',
     sb_visible:'Visible sites:',
-    sb_province:'Province CE / NA / SA',
     section_abstract:'Abstract', section_bio:'Bio',
     p_comune:'Municipality', p_tipo:'Type', p_codice:'Code',
     p_suolo:'Soil', p_acqua:'Water', p_stato:'Status',
@@ -1259,6 +1244,7 @@ function catName(cat){return T(CAT_KEY[cat]||cat);}
 const cartoPosNL = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
 const cartoPos   = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
 const satellite  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
+const cartoDark  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
 const S2_BOUNDS = L.latLngBounds([[39.8, 13.4],[41.6, 16.0]]);
 const s2Tiles    = L.tileLayer('https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg',{
   attribution:'Sentinel-2 cloudless 2024 © <a href="https://eox.at" target="_blank">EOX IT Services</a>',
@@ -1266,7 +1252,7 @@ const s2Tiles    = L.tileLayer('https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless
   bounds: S2_BOUNDS
 });
 
-cartoPosNL.addTo(map);
+satellite.addTo(map);
 L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);
 
 // ── MINIMAP ──
@@ -1615,24 +1601,19 @@ renderList();
 map.fitBounds(SITES.map(s=>[s.lat,s.lon]),{padding:[40,40]});
 
 // ── BASEMAP SWITCHER ──
-const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {attribution:'© OpenStreetMap contributors', maxZoom:19});
-const mapsTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-  {attribution:'© OpenStreetMap © CARTO', maxZoom:19});
+const mapsTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+  {attribution:'© Esri', maxZoom:19});
 
-let currentBM = cartoPosNL;
-let currentBMKey = 'light';
-const bmLayers = {light: cartoPosNL, osm: osmTiles, sat: satellite, maps: mapsTiles};
+let currentBM = satellite;
+let currentBMKey = 'sat';
+const bmLayers = {sat: satellite, dark: cartoDark, maps: mapsTiles};
 const bmTiles3d = {
-  light: ['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'],
-  osm:   ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png'],
   s2:    ['https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg'],
   // s2 bounds used when adding source in 3D: [13.4, 39.8, 16.0, 41.6]
   sat:   ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-  maps:  null  // vector style — handled separately in init3D
+  dark:  ['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'],
+  maps:  ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}']
 };
-const MAPS_VECTOR_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 
 function setBasemap(key) {
   if (currentBM) map.removeLayer(currentBM);
@@ -1646,19 +1627,12 @@ function setBasemap(key) {
 }
 
 function swap3DBasemap(key) {
-  // Vector style requires full reinit
-  if (key === 'maps' || currentBMKey === 'maps') {
-    glMap.remove();
-    glMap = null;
-    init3D();
-    return;
-  }
   try {
     if (glMap.getLayer('base')) glMap.removeLayer('base');
     if (glMap.getSource('carto')) glMap.removeSource('carto');
     glMap.addSource('carto', {
       type: 'raster', tiles: bmTiles3d[key], tileSize: 256,
-      attribution: key==='osm'?'© OpenStreetMap':'© CartoDB/Esri',
+      attribution: '© Esri',
       ...(key==='s2' ? {bounds:[13.4,39.8,16.0,41.6], maxzoom:14} : {})
     });
     const firstData = ['comuni-fill','part-fill','shp-fill','beni-pts','sites-pts']
@@ -1890,10 +1864,9 @@ function addTerrainAndData() {
 
 function init3D() {
   const c = map.getCenter();
-  const isVector = currentBMKey === 'maps';
 
   // Keep baseStyle minimal — no terrain source here (avoids blocking the load event)
-  const baseStyle = isVector ? MAPS_VECTOR_STYLE : {
+  const baseStyle = {
     version: 8,
     glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
     sources: {
@@ -1901,7 +1874,7 @@ function init3D() {
         type: 'raster',
         tiles: bmTiles3d[currentBMKey],
         tileSize: 256,
-        attribution: currentBMKey==='osm'?'© OpenStreetMap':'© CartoDB/Esri',
+        attribution: '© Esri',
         ...(currentBMKey==='s2' ? {bounds:[13.4,39.8,16.0,41.6], maxzoom:14} : {})
       }
     },
