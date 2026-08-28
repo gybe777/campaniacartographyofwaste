@@ -1339,8 +1339,7 @@ const comuniLg=L.layerGroup();
 let comuniOn=true;
 COMUNI.forEach(c=>{
   L.polygon(c.rings,{color:'#0ea5e9',weight:0.8,fillColor:'#0ea5e9',fillOpacity:0.06})
-    .bindPopup(()=>'<div class="popup-wrap"><div class="popup-title">'+(c.props.comune||T('p_comune'))+'</div>'
-      +'<div class="popup-row"><span class="popup-label">'+T('p_provincia')+'</span><span>'+(c.props.sigla_pro||'')+'</span></div></div>')
+    .bindPopup(()=>comuniPopupHTML(c))
     .addTo(comuniLg);
 });
 comuniLg.addTo(map);
@@ -1351,10 +1350,7 @@ let partOn=true;
 PARTICELLE.forEach(p=>{
   const hw=(p.props.rifiuti==='SI');
   L.polygon(p.rings,{color:'#EAB308',weight:0.7,fillColor:'#EAB308',fillOpacity:0.1})
-    .bindPopup(()=>'<div class="popup-wrap"><div class="popup-title">'+T('p_particella')+'</div>'
-      +'<div class="popup-row"><span class="popup-label">'+T('p_rifiuti')+'</span><span>'+(hw?T('yes'):T('no'))+'</span></div>'
-      +(p.props.decreto?'<div class="popup-row"><span class="popup-label">'+T('p_decreto')+'</span><span>'+p.props.decreto+'</span></div>':'')
-      +'</div>')
+    .bindPopup(()=>particellePopupHTML(p))
     .addTo(partLg);
 });
 partLg.addTo(map);
@@ -1386,14 +1382,7 @@ SVERSAMENTI.forEach(v=>{
   L.marker([v.lat,v.lon],{
     icon:L.divIcon({className:'',html:'<svg width="10" height="12" viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg" style="display:block"><polygon points="5,12 0,0 10,0" fill="#dc2626" opacity="'+(cleared?0.4:0.8)+'"/></svg>',iconSize:[10,12],iconAnchor:[5,6]})
   })
-    .bindPopup(()=>'<div class="popup-wrap"><div class="popup-title">'+T('p_sver')+'</div>'
-      +'<div class="popup-row"><span class="popup-label">'+T('p_comune')+'</span><span>'+(v.props.comune||'')+'</span></div>'
-      +'<div class="popup-row"><span class="popup-label">'+T('p_provincia')+'</span><span>'+(v.props.provincia||'')+'</span></div>'
-      +(v.props.indirizzo?'<div class="popup-row"><span class="popup-label">'+T('p_indirizzo')+'</span><span>'+v.props.indirizzo+'</span></div>':'')
-      +'<div class="popup-row"><span class="popup-label">'+T('p_stato')+'</span><span>'+(v.props.stato||'')+'</span></div>'
-      +(v.props.data?'<div class="popup-row"><span class="popup-label">'+T('p_data')+'</span><span>'+v.props.data+'</span></div>':'')
-      +(v.props.url?'<div class="popup-row"><a href="'+v.props.url+'" target="_blank" rel="noopener">'+T('p_link')+'</a></div>':'')
-      +'</div>')
+    .bindPopup(()=>sverPopupHTML(v))
     .addTo(sverLg);
 });
 sverLg.addTo(map);
@@ -1527,6 +1516,28 @@ function sitePopupHTML(s){
     +(s['Contaminants - Soil']?'<div class="popup-row"><span class="popup-label">'+T('p_suolo')+'</span><span>'+s['Contaminants - Soil']+'</span></div>':'')
     +(s['Contaminants - Water']?'<div class="popup-row"><span class="popup-label">'+T('p_acqua')+'</span><span>'+s['Contaminants - Water']+'</span></div>':'')
     +'<div class="popup-row"><span class="popup-label">'+T('p_stato')+'</span><span>'+s['Procedural Status']+'</span></div>'
+    +'</div>';
+}
+
+function sverPopupHTML(v){
+  return '<div class="popup-wrap"><div class="popup-title">'+T('p_sver')+'</div>'
+    +'<div class="popup-row"><span class="popup-label">'+T('p_comune')+'</span><span>'+(v.props.comune||'')+'</span></div>'
+    +'<div class="popup-row"><span class="popup-label">'+T('p_provincia')+'</span><span>'+(v.props.provincia||'')+'</span></div>'
+    +(v.props.indirizzo?'<div class="popup-row"><span class="popup-label">'+T('p_indirizzo')+'</span><span>'+v.props.indirizzo+'</span></div>':'')
+    +'<div class="popup-row"><span class="popup-label">'+T('p_stato')+'</span><span>'+(v.props.stato||'')+'</span></div>'
+    +(v.props.data?'<div class="popup-row"><span class="popup-label">'+T('p_data')+'</span><span>'+v.props.data+'</span></div>':'')
+    +(v.props.url?'<div class="popup-row"><a href="'+v.props.url+'" target="_blank" rel="noopener">'+T('p_link')+'</a></div>':'')
+    +'</div>';
+}
+function comuniPopupHTML(c){
+  return '<div class="popup-wrap"><div class="popup-title">'+(c.props.comune||T('p_comune'))+'</div>'
+    +'<div class="popup-row"><span class="popup-label">'+T('p_provincia')+'</span><span>'+(c.props.sigla_pro||'')+'</span></div></div>';
+}
+function particellePopupHTML(p){
+  const hw=(p.props.rifiuti==='SI');
+  return '<div class="popup-wrap"><div class="popup-title">'+T('p_particella')+'</div>'
+    +'<div class="popup-row"><span class="popup-label">'+T('p_rifiuti')+'</span><span>'+(hw?T('yes'):T('no'))+'</span></div>'
+    +(p.props.decreto?'<div class="popup-row"><span class="popup-label">'+T('p_decreto')+'</span><span>'+p.props.decreto+'</span></div>':'')
     +'</div>';
 }
 
@@ -1704,6 +1715,12 @@ function addTerrainAndData() {
     glMap.addSource('comuni',{type:'geojson',data:comuniFC});
     glMap.addLayer({id:'comuni-fill',type:'fill',source:'comuni',paint:{'fill-color':'#0ea5e9','fill-opacity':0.07}});
     glMap.addLayer({id:'comuni-line',type:'line',source:'comuni',paint:{'line-color':'#0ea5e9','line-width':0.8,'line-opacity':0.35}});
+    glMap.on('click','comuni-fill',e=>{
+      new maplibregl.Popup({closeButton:false,maxWidth:'320px'})
+        .setLngLat(e.lngLat).setHTML(comuniPopupHTML({props:e.features[0].properties})).addTo(glMap);
+    });
+    glMap.on('mouseenter','comuni-fill',()=>{glMap.getCanvas().style.cursor='pointer';});
+    glMap.on('mouseleave','comuni-fill',()=>{glMap.getCanvas().style.cursor='';});
   }
   if (!glMap.getSource('particelle')) {
     const partFC = {type:'FeatureCollection', features: PARTICELLE.map(p=>({
@@ -1712,6 +1729,12 @@ function addTerrainAndData() {
     glMap.addSource('particelle',{type:'geojson',data:partFC});
     glMap.addLayer({id:'part-fill',type:'fill',source:'particelle',
       paint:{'fill-color':'#EAB308','fill-opacity':0.12}});
+    glMap.on('click','part-fill',e=>{
+      new maplibregl.Popup({closeButton:false,maxWidth:'320px'})
+        .setLngLat(e.lngLat).setHTML(particellePopupHTML({props:e.features[0].properties})).addTo(glMap);
+    });
+    glMap.on('mouseenter','part-fill',()=>{glMap.getCanvas().style.cursor='pointer';});
+    glMap.on('mouseleave','part-fill',()=>{glMap.getCanvas().style.cursor='';});
   }
   if (!glMap.getSource('shp')) {
     const shpFeat=[];
@@ -1725,54 +1748,86 @@ function addTerrainAndData() {
     glMap.addSource('shp',{type:'geojson',data:{type:'FeatureCollection',features:shpFeat}});
     glMap.addLayer({id:'shp-fill',type:'fill',source:'shp',paint:{'fill-color':['get','color'],'fill-opacity':0.1}});
     glMap.addLayer({id:'shp-line',type:'line',source:'shp',paint:{'line-color':['get','color'],'line-width':0.8}});
+    glMap.on('click','shp-fill',e=>{
+      new maplibregl.Popup({closeButton:false,maxWidth:'320px'})
+        .setLngLat(e.lngLat)
+        .setHTML('<div class="popup-wrap"><div class="popup-title">'+e.features[0].properties.name+'</div></div>')
+        .addTo(glMap);
+    });
+    glMap.on('mouseenter','shp-fill',()=>{glMap.getCanvas().style.cursor='pointer';});
+    glMap.on('mouseleave','shp-fill',()=>{glMap.getCanvas().style.cursor='';});
+  }
+  // Beni Agricoli: bake the same purple flag/pin shape used in 2D (line + filled triangle), 2x for sharpness
+  if(!glMap.hasImage('beni-flag')){
+    const fw=26,fh=40,fc=document.createElement('canvas');fc.width=fw;fc.height=fh;
+    const fx=fc.getContext('2d');fx.clearRect(0,0,fw,fh);
+    const sx=fw/8, sy=fh/13;
+    fx.strokeStyle='#a855f7'; fx.globalAlpha=0.6; fx.lineWidth=1.2*Math.min(sx,sy);
+    fx.beginPath(); fx.moveTo(2*sx,1*sy); fx.lineTo(2*sx,12*sy); fx.stroke();
+    fx.globalAlpha=0.5; fx.fillStyle='#a855f7';
+    fx.beginPath(); fx.moveTo(2*sx,1*sy); fx.lineTo(8*sx,3.5*sy); fx.lineTo(2*sx,6*sy); fx.closePath(); fx.fill();
+    fx.globalAlpha=1;
+    glMap.addImage('beni-flag',fx.getImageData(0,0,fw,fh));
   }
   if (!glMap.getSource('beni')) {
     const beniFC={type:'FeatureCollection',features:BENI.map(b=>({
       type:'Feature',geometry:{type:'Point',coordinates:[b.lon,b.lat]},properties:b.props
     }))};
     glMap.addSource('beni',{type:'geojson',data:beniFC});
-    glMap.addLayer({id:'beni-pts',type:'circle',source:'beni',
-      paint:{'circle-radius':4,'circle-color':'#a855f7','circle-opacity':0.5,'circle-stroke-width':1,'circle-stroke-color':'#a855f7','circle-stroke-opacity':0.4}});
+    glMap.addLayer({id:'beni-pts',type:'symbol',source:'beni',
+      layout:{'icon-image':'beni-flag','icon-size':0.5,'icon-anchor':'bottom-left','icon-allow-overlap':true,'icon-ignore-placement':true}
+    });
+    glMap.on('click','beni-pts',e=>{
+      new maplibregl.Popup({closeButton:false,maxWidth:'320px'})
+        .setLngLat(e.lngLat).setHTML(beniPopupHTML({props:e.features[0].properties})).addTo(glMap);
+    });
+    glMap.on('mouseenter','beni-pts',()=>{glMap.getCanvas().style.cursor='pointer';});
+    glMap.on('mouseleave','beni-pts',()=>{glMap.getCanvas().style.cursor='';});
+  }
+  // Register downward-arrow SDF icon (white silhouette; color applied via paint) — shared by sver + siti, matching 2D triangle markers
+  if(!glMap.hasImage('arrow-down')){
+    const sz=20,cv=document.createElement('canvas');cv.width=sz;cv.height=sz;
+    const cx=cv.getContext('2d');cx.clearRect(0,0,sz,sz);
+    cx.fillStyle='#ffffff';cx.beginPath();
+    cx.moveTo(sz/2,sz);cx.lineTo(0,0);cx.lineTo(sz,0);cx.closePath();cx.fill();
+    glMap.addImage('arrow-down',cx.getImageData(0,0,sz,sz),{sdf:true});
   }
   if (!glMap.getSource('sver')) {
     const sverFC={type:'FeatureCollection',features:SVERSAMENTI.map(v=>({
       type:'Feature',geometry:{type:'Point',coordinates:[v.lon,v.lat]},properties:v.props
     }))};
     glMap.addSource('sver',{type:'geojson',data:sverFC});
-    glMap.addLayer({id:'sver-pts',type:'circle',source:'sver',
-      paint:{'circle-radius':4,'circle-color':'#dc2626','circle-opacity':0.5,'circle-stroke-width':1,'circle-stroke-color':'rgba(255,255,255,0.4)'}});
+    glMap.addLayer({id:'sver-pts',type:'symbol',source:'sver',
+      layout:{
+        'icon-image':'arrow-down',
+        'icon-size':['interpolate',['linear'],['zoom'],8,0.45,14,0.9],
+        'icon-allow-overlap':true,'icon-ignore-placement':true
+      },
+      paint:{'icon-color':'#dc2626','icon-opacity':['case',['==',['get','stato'],'Smaltito'],0.4,0.8]}
+    });
+    glMap.on('click','sver-pts',e=>{
+      new maplibregl.Popup({closeButton:false,maxWidth:'320px'})
+        .setLngLat(e.lngLat).setHTML(sverPopupHTML({props:e.features[0].properties})).addTo(glMap);
+    });
+    glMap.on('mouseenter','sver-pts',()=>{glMap.getCanvas().style.cursor='pointer';});
+    glMap.on('mouseleave','sver-pts',()=>{glMap.getCanvas().style.cursor='';});
   }
   if (!glMap.getSource('sites3d')) {
     const sitesFC={type:'FeatureCollection',features:SITES.map(s=>({
-      type:'Feature', geometry:{type:'Point',coordinates:[s.lon,s.lat]},
-      properties:{name:s.Name,municipality:s.Municipality,type:s['Site Type'],
-                  code:s.Code,status:s['Procedural Status']}
+      type:'Feature', geometry:{type:'Point',coordinates:[s.lon,s.lat]}, properties:s
     }))};
-    // Draw triangle matching legend exactly: 10×12 pointing down (▽), #EE4238, opacity 0.8
-    // 2× canvas (20×24) for sharpness, icon-size:0.5 renders it at 10×12
-    const _tw=20,_th=24,_tc=document.createElement('canvas');
-    _tc.width=_tw; _tc.height=_th;
-    const _tx=_tc.getContext('2d');
-    _tx.clearRect(0,0,_tw,_th);
-    _tx.globalAlpha=0.8;
-    _tx.beginPath(); _tx.moveTo(0,0); _tx.lineTo(_tw,0); _tx.lineTo(_tw/2,_th); _tx.closePath();
-    _tx.fillStyle='#EE4238'; _tx.fill();
-    _tx.globalAlpha=1;
-    if(!glMap.hasImage('triangle-marker')) glMap.addImage('triangle-marker',_tx.getImageData(0,0,_tw,_th));
     glMap.addSource('sites3d',{type:'geojson',data:sitesFC});
-    // Triangle markers — one per site, no clustering
     glMap.addLayer({id:'sites-pts',type:'symbol',source:'sites3d',
-      layout:{'icon-image':'triangle-marker','icon-size':0.5,'icon-allow-overlap':true}
+      layout:{
+        'icon-image':'arrow-down',
+        'icon-size':['interpolate',['linear'],['zoom'],8,0.45,14,0.9],
+        'icon-allow-overlap':true,'icon-ignore-placement':true
+      },
+      paint:{'icon-color':'#eab308','icon-opacity':0.8}
     });
     glMap.on('click','sites-pts',e=>{
-      const s=e.features[0].properties;
       new maplibregl.Popup({closeButton:false,maxWidth:'320px'})
-        .setLngLat(e.lngLat)
-        .setHTML('<div class="popup-wrap"><div class="popup-title">'+s.name+'</div>'
-          +'<div class="popup-row"><span class="popup-label">'+T('p_comune')+'</span><span>'+(s.municipality||'—')+'</span></div>'
-          +'<div class="popup-row"><span class="popup-label">'+T('p_tipo')+'</span><span>'+s.type+'</span></div>'
-          +'<div class="popup-row"><span class="popup-label">'+T('p_stato')+'</span><span>'+s.status+'</span></div>'
-          +'</div>').addTo(glMap);
+        .setLngLat(e.lngLat).setHTML(sitePopupHTML(e.features[0].properties)).addTo(glMap);
     });
     glMap.on('mouseenter','sites-pts',()=>{glMap.getCanvas().style.cursor='pointer';});
     glMap.on('mouseleave','sites-pts',()=>{glMap.getCanvas().style.cursor='';});
