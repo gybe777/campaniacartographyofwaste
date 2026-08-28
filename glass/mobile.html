@@ -841,6 +841,10 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
 }
 #sidebar.mob-open { transform: translateY(0); }
 
+/* Mobile sidebar shows exactly one of: search bar, or layer list (never both) */
+#sidebar.mode-search #tab-layers { display: none !important; }
+#sidebar.mode-layers #mob-sidebar-search { display: none !important; }
+
 /* On mobile: hide the duplicate desktop search input (we use #mob-sidebar-search instead) */
 .search-wrap { display: none !important; }
 
@@ -1073,7 +1077,7 @@ body.bm-maps .bm-btn.active { background: rgba(255,255,255,0.85) !important; }
 <!-- HEADER -->
 <div id="header">
   <div class="hdr-left">
-    <button class="hdr-logo" id="mob-logo" onclick="mobTogglePanel()" title="Wasting the Land">WL</button>
+    <button class="hdr-logo" id="mob-logo" onclick="mobLogoInfo()" title="Wasting the Land">WL</button>
     <button class="hdr-icon-btn" id="btn-search" onclick="mobOpenSearch()" title="Search" aria-label="Search">
       <svg width="17" height="17" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.8"/><path d="M17 17l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
@@ -1098,7 +1102,7 @@ body.bm-maps .bm-btn.active { background: rgba(255,255,255,0.85) !important; }
 <div class="layout">
 
   <!-- SIDEBAR -->
-  <div id="sidebar">
+  <div id="sidebar" class="mode-layers">
 
     <!-- MOBILE: search at top of panel -->
     <div id="mob-sidebar-search">
@@ -2187,19 +2191,26 @@ function mobTogglePanel() {
 }
 
 /* ── MOBILE: Search icon opens the panel and focuses the search input ── */
+/* Each of WL / Search / Layers shows its own view. Pressing the button
+   for the view already showing closes the panel; pressing a different
+   button switches to that view instead of closing. */
 function mobOpenSearch() {
-  var sb   = document.getElementById('sidebar');
-  var logo = document.getElementById('mob-logo');
+  var sb    = document.getElementById('sidebar');
+  var panel = document.getElementById('info-panel');
+  var logo  = document.getElementById('mob-logo');
   if (!sb) return;
-  var wasOpen = sb.classList.contains('mob-open');
-  if (wasOpen) {
+  var infoOpen = panel && panel.classList.contains('open');
+  var searchShowing = sb.classList.contains('mob-open') && sb.classList.contains('mode-search') && !infoOpen;
+  if (searchShowing) {
     var inp0 = document.getElementById('mob-search-input');
     if (inp0) inp0.blur();
     sb.classList.remove('mob-open');
     if (logo) logo.classList.remove('mob-open');
     return;
   }
-  sb.classList.add('mob-open');
+  if (panel) panel.classList.remove('open');
+  sb.classList.add('mob-open', 'mode-search');
+  sb.classList.remove('mode-layers');
   if (logo) logo.classList.add('mob-open');
   setTimeout(function(){
     var inp = document.getElementById('mob-search-input');
@@ -2207,41 +2218,44 @@ function mobOpenSearch() {
   }, 220);
 }
 
-/* ── MOBILE: Layers icon opens the panel scrolled to the layer list ── */
+/* ── MOBILE: Layers icon shows just the layer list ── */
 function mobOpenLayers() {
-  var sb   = document.getElementById('sidebar');
-  var logo = document.getElementById('mob-logo');
+  var sb    = document.getElementById('sidebar');
+  var panel = document.getElementById('info-panel');
+  var logo  = document.getElementById('mob-logo');
   if (!sb) return;
-  var wasOpen = sb.classList.contains('mob-open');
-  if (wasOpen) {
+  var infoOpen = panel && panel.classList.contains('open');
+  var layersShowing = sb.classList.contains('mob-open') && sb.classList.contains('mode-layers') && !infoOpen;
+  if (layersShowing) {
     sb.classList.remove('mob-open');
     if (logo) logo.classList.remove('mob-open');
     return;
   }
-  sb.classList.add('mob-open');
+  if (panel) panel.classList.remove('open');
+  sb.classList.add('mob-open', 'mode-layers');
+  sb.classList.remove('mode-search');
   if (logo) logo.classList.add('mob-open');
   var inp = document.getElementById('mob-search-input');
   if (inp) inp.blur();
   var list = document.getElementById('tab-layers');
   if (list) list.scrollTop = 0;
 }
-/* ── MOBILE: logo opens sidebar + info panel ── */
+/* ── MOBILE: WL shows the research/about text (info panel) ── */
 function mobLogoInfo() {
   var sb    = document.getElementById('sidebar');
   var panel = document.getElementById('info-panel');
   var logo  = document.getElementById('mob-logo');
-  if (!sb) return;
-  var isOpen = sb.classList.contains('mob-open');
-  // Always close everything first
-  sb.classList.remove('mob-open');
-  if (logo)  logo.classList.remove('mob-open');
-  if (panel) panel.classList.remove('open');
-  // If it was closed → open sidebar + info panel
-  if (!isOpen) {
-    sb.classList.add('mob-open');
-    if (logo)  logo.classList.add('mob-open');
-    if (panel) panel.classList.add('open');
+  if (!sb || !panel) return;
+  var infoShowing = sb.classList.contains('mob-open') && panel.classList.contains('open');
+  if (infoShowing) {
+    sb.classList.remove('mob-open');
+    if (logo) logo.classList.remove('mob-open');
+    panel.classList.remove('open');
+    return;
   }
+  sb.classList.add('mob-open');
+  if (logo) logo.classList.add('mob-open');
+  panel.classList.add('open');
 }
 
 /* ── MOBILE: wire panel search to existing search logic ── */
