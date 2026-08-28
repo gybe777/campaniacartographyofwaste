@@ -916,7 +916,6 @@ body {
   <div id="bm-ctrl">
     <button class="bm-btn active" id="bm-sat"   onclick="setBasemap('sat')">SAT</button>
     <button class="bm-btn" id="bm-dark"  onclick="setBasemap('dark')">DARK</button>
-    <button class="bm-btn" id="bm-osm"   onclick="setBasemap('osm')">OSM</button>
     <button class="bm-btn" id="bm-maps"  onclick="setBasemap('maps')">MAPS</button>
   </div>
   <a href="mobile.html" id="mob-link" title="Open mobile version">MOBILE</a>
@@ -1421,22 +1420,17 @@ renderList();
 map.fitBounds(SITES.map(s=>[s.lat,s.lon]),{padding:[40,40]});
 
 // ── BASEMAP SWITCHER ──
-const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {attribution:'© OpenStreetMap contributors', maxZoom:19});
-const mapsTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-  {attribution:'© OpenStreetMap © CARTO', maxZoom:19});
+const mapsTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+  {attribution:'© Esri', maxZoom:19});
 
 let currentBM = satellite;
 let currentBMKey = 'sat';
-const bmLayers = {sat: satellite, dark: cartoDark, osm: osmTiles, maps: mapsTiles};
+const bmLayers = {sat: satellite, dark: cartoDark, maps: mapsTiles};
 const bmTiles3d = {
-  osm:   ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png'],
   sat:   ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
   dark:  ['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'],
-  maps:  null  // vector style — handled separately in init3D
+  maps:  ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}']
 };
-const MAPS_VECTOR_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 
 function setBasemap(key) {
   if (currentBM) map.removeLayer(currentBM);
@@ -1450,19 +1444,12 @@ function setBasemap(key) {
 }
 
 function swap3DBasemap(key) {
-  // Vector style requires full reinit
-  if (key === 'maps' || currentBMKey === 'maps') {
-    glMap.remove();
-    glMap = null;
-    init3D();
-    return;
-  }
   try {
     if (glMap.getLayer('base')) glMap.removeLayer('base');
     if (glMap.getSource('carto')) glMap.removeSource('carto');
     glMap.addSource('carto', {
       type: 'raster', tiles: bmTiles3d[key], tileSize: 256,
-      attribution: key==='osm'?'© OpenStreetMap':'© CartoDB/Esri'
+      attribution: '© Esri'
     });
     const firstData = ['comuni-fill','part-fill','shp-fill','beni-pts','sites-pts']
       .find(id => { try { return !!glMap.getLayer(id); } catch(e){ return false; } });
@@ -1697,16 +1684,15 @@ function addTerrainAndData() {
 
 function init3D() {
   const c = map.getCenter();
-  const isVector = currentBMKey === 'maps';
 
-  const baseStyle = isVector ? MAPS_VECTOR_STYLE : {
+  const baseStyle = {
     version: 8,
     sources: {
       carto: {
         type: 'raster',
         tiles: bmTiles3d[currentBMKey],
         tileSize: 256,
-        attribution: currentBMKey==='osm'?'© OpenStreetMap':'© CartoDB/Esri'
+        attribution: '© Esri'
       },
       terrain: {
         type: 'raster-dem',
