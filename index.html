@@ -598,7 +598,7 @@ body {
 }
 #info-panel.open { display: flex; }
 .info-hdr {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: flex-end;
   padding: 10px 12px 8px; border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -885,13 +885,11 @@ body {
   <div id="info-btn" onclick="toggleInfo()" data-i18n-title="info_title" title="Info sul progetto">i</div>
   <div id="info-panel">
     <div class="info-hdr">
-      <strong>Wasting the Land</strong>
       <button class="info-close" onclick="toggleInfo()">×</button>
     </div>
     <div class="info-body">
 
       <div class="info-section">
-        <div class="info-author">Antonio del Giudice</div>
         <div class="info-tag">PhD Research · Royal College of Art</div>
       </div>
 
@@ -909,7 +907,6 @@ body {
 
       <div class="info-section">
         <div class="info-text">Ultimately, the project aims to strengthen and support the ongoing efforts of communities on the front lines of socio-environmental conflict in the Campania region. Its collaborative methodology is designed to ensure that the research produces not only academic knowledge but also practical tools and strategies that are directly relevant and valuable to the communities involved.</div>
-        <a class="info-link" href="https://pgr.rca-architecture.com/people/antonio-del-giudice" target="_blank" style="display:inline-block;margin-top:10px;">pgr.rca-architecture.com ↗</a>
       </div>
 
     </div>
