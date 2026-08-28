@@ -1252,8 +1252,8 @@ const CAT_KEY={
 function catName(cat){return T(CAT_KEY[cat]||cat);}
 
 // Light/minimal basemap (FA-style cream map)
-const cartoPosNL = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19});
-const cartoPos   = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19});
+const cartoPosNL = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
+const cartoPos   = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
 const satellite  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
 const S2_BOUNDS = L.latLngBounds([[39.8, 13.4],[41.6, 16.0]]);
 const s2Tiles    = L.tileLayer('https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg',{
@@ -1267,7 +1267,7 @@ L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);
 
 // ── MINIMAP ──
 try {
-  const miniTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:19});
+  const miniTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'',maxZoom:19,maxNativeZoom:16});
   new L.Control.MiniMap(miniTile,{
     position:'bottomright',
     width:160, height:120,
@@ -1620,8 +1620,7 @@ let currentBM = cartoPosNL;
 let currentBMKey = 'light';
 const bmLayers = {light: cartoPosNL, osm: osmTiles, sat: satellite, maps: mapsTiles};
 const bmTiles3d = {
-  light: ['https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
-          'https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png'],
+  light: ['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'],
   osm:   ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
           'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png'],
   s2:    ['https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg'],

@@ -1032,10 +1032,10 @@ const CAT_KEY={
 function catName(cat){return T(CAT_KEY[cat]||cat);}
 
 // Light/minimal basemap (FA-style cream map)
-const cartoPosNL = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19});
-const cartoPos   = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19});
+const cartoPosNL = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
+const cartoPos   = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
 const satellite  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
-const cartoDark  = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19});
+const cartoDark  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
 
 cartoPosNL.addTo(map);
 L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);
@@ -1349,13 +1349,11 @@ let currentBM = cartoPosNL;
 let currentBMKey = 'light';
 const bmLayers = {light: cartoPosNL, osm: osmTiles, sat: satellite, dark: cartoDark, maps: mapsTiles};
 const bmTiles3d = {
-  light: ['https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
-          'https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png'],
+  light: ['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'],
   osm:   ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
           'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png'],
   sat:   ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-  dark:  ['https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
-          'https://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png'],
+  dark:  ['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'],
   maps:  null  // vector style — handled separately in init3D
 };
 const MAPS_VECTOR_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
