@@ -768,11 +768,8 @@ body {
       <div class="layer-section">
         <div class="layer-row" id="row-beni" onclick="toggleExpand('beni')">
           <div class="lr-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line x1="8" y1="14" x2="8" y2="6" stroke="#a855f7" stroke-width="1.4" stroke-linecap="round"/>
-            <ellipse cx="8" cy="4" rx="2" ry="2.2" fill="#a855f7" opacity="0.9"/>
-            <path d="M8 11 C8 11 5.5 10.5 5 9 C6.8 8.8 8 10.2 8 10.2" fill="#a855f7" opacity="0.75" stroke="none"/>
-            <path d="M8 9.5 C8 9.5 10.5 9 11 7.5 C9.2 7.3 8 8.7 8 8.7" fill="#a855f7" opacity="0.75" stroke="none"/>
-            <path d="M8 8 C8 8 5.5 7.5 5 6 C6.8 5.8 8 7.2 8 7.2" fill="#a855f7" opacity="0.6" stroke="none"/>
+            <line x1="5" y1="3" x2="5" y2="13" stroke="#a855f7" stroke-width="1.2" opacity="0.6"/>
+            <polygon points="5,3 13,6 5,9" fill="#a855f7" opacity="0.5"/>
           </svg></div>
           <span class="lr-name" data-i18n="layer_beni">Beni Agricoli Confiscati</span>
           <span class="lr-count">21</span>
@@ -1092,7 +1089,7 @@ Object.entries(SHP_DATA).forEach(([name,polys])=>{
 const beniLg=L.layerGroup();
 let beniOn=true;
 BENI.forEach(b=>{
-  L.circleMarker([b.lat,b.lon],{radius:7,color:'#a855f7',weight:2,fillColor:'#a855f7',fillOpacity:0.75})
+  L.marker([b.lat,b.lon],{icon:L.divIcon({className:'',html:'<svg width="13" height="20" viewBox="0 0 8 13" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="2" y1="1" x2="2" y2="12" stroke="#a855f7" stroke-width="1.2" opacity="0.6"/><polygon points="2,1 8,3.5 2,6" fill="#a855f7" opacity="0.5"/></svg>',iconSize:[13,20],iconAnchor:[2,20]})})
     .bindPopup(()=>beniPopupHTML(b))
     .addTo(beniLg);
 });
@@ -1508,13 +1505,26 @@ function addTerrainAndData() {
     glMap.on('mouseenter','shp-fill',()=>{glMap.getCanvas().style.cursor='pointer';});
     glMap.on('mouseleave','shp-fill',()=>{glMap.getCanvas().style.cursor='';});
   }
+  // Beni Agricoli: bake the same purple flag/pin shape used in 2D (line + filled triangle), 2x for sharpness
+  if(!glMap.hasImage('beni-flag')){
+    const fw=26,fh=40,fc=document.createElement('canvas');fc.width=fw;fc.height=fh;
+    const fx=fc.getContext('2d');fx.clearRect(0,0,fw,fh);
+    const sx=fw/8, sy=fh/13;
+    fx.strokeStyle='#a855f7'; fx.globalAlpha=0.6; fx.lineWidth=1.2*Math.min(sx,sy);
+    fx.beginPath(); fx.moveTo(2*sx,1*sy); fx.lineTo(2*sx,12*sy); fx.stroke();
+    fx.globalAlpha=0.5; fx.fillStyle='#a855f7';
+    fx.beginPath(); fx.moveTo(2*sx,1*sy); fx.lineTo(8*sx,3.5*sy); fx.lineTo(2*sx,6*sy); fx.closePath(); fx.fill();
+    fx.globalAlpha=1;
+    glMap.addImage('beni-flag',fx.getImageData(0,0,fw,fh));
+  }
   if (!glMap.getSource('beni')) {
     const beniFC={type:'FeatureCollection',features:BENI.map(b=>({
       type:'Feature',geometry:{type:'Point',coordinates:[b.lon,b.lat]},properties:b.props
     }))};
     glMap.addSource('beni',{type:'geojson',data:beniFC});
-    glMap.addLayer({id:'beni-pts',type:'circle',source:'beni',
-      paint:{'circle-radius':7,'circle-color':'#a855f7','circle-stroke-width':2,'circle-stroke-color':'rgba(255,255,255,0.7)'}});
+    glMap.addLayer({id:'beni-pts',type:'symbol',source:'beni',
+      layout:{'icon-image':'beni-flag','icon-size':0.5,'icon-anchor':'bottom-left','icon-allow-overlap':true,'icon-ignore-placement':true}
+    });
     if (!layerMap.beni.getOn()) { glMap.setLayoutProperty('beni-pts','visibility','none'); }
     glMap.on('click','beni-pts',e=>{
       new maplibregl.Popup({closeButton:false,maxWidth:'280px'})
