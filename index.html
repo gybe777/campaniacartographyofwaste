@@ -149,6 +149,14 @@ body {
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
+  transition: width 0.22s ease, opacity 0.18s ease, border-color 0.22s ease;
+}
+/* collapsed: clicking the already-active Layers/Cerca tab hides the panel again */
+#sidebar.collapsed {
+  width: 0;
+  opacity: 0;
+  border-right-width: 0;
+  pointer-events: none;
 }
 
 /* Tab sub-header inside sidebar */
@@ -1217,7 +1225,20 @@ function toggleLayerVisibility(id) {
 
 // ── TAB SWITCHING ──
 function switchTab(tab) {
-  document.querySelectorAll('.hdr-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  const tabs = document.querySelectorAll('.hdr-tab');
+  const clickedWasActive = Array.from(tabs).some(t=>t.dataset.tab===tab && t.classList.contains('active'));
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOpen = sidebar && !sidebar.classList.contains('collapsed');
+
+  if (clickedWasActive && sidebarOpen) {
+    // clicking the already-active tab again collapses the panel
+    if (sidebar) sidebar.classList.add('collapsed');
+    tabs.forEach(t=>t.classList.remove('active'));
+    return;
+  }
+
+  if (sidebar) sidebar.classList.remove('collapsed');
+  tabs.forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   document.getElementById('tab-layers').style.display=tab==='layers'?'block':'none';
   const st=document.getElementById('tab-search');
   st.style.display=tab==='search'?'flex':'none';
