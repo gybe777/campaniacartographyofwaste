@@ -1818,7 +1818,7 @@ function addTerrainAndData() {
     const sverFC={type:'FeatureCollection',features:SVERSAMENTI.map(v=>({
       type:'Feature',geometry:{type:'Point',coordinates:[v.lon,v.lat]},properties:v.props
     }))};
-    glMap.addSource('sver',{type:'geojson',data:sverFC,cluster:true,clusterRadius:45,clusterMaxZoom:14});
+    glMap.addSource('sver',{type:'geojson',data:sverFC,cluster:true,clusterRadius:35,clusterMaxZoom:11});
     glMap.addLayer({id:'sver-clusters',type:'circle',source:'sver',filter:['has','point_count'],
       paint:{'circle-color':'#dc2626','circle-opacity':0.88,'circle-stroke-width':1,'circle-stroke-color':'rgba(255,255,255,0.25)',
         'circle-radius':['step',['get','point_count'],14,10,17,50,20]}});
@@ -1851,7 +1851,7 @@ function addTerrainAndData() {
     glMap.on('mouseleave','sver-pts',()=>{glMap.getCanvas().style.cursor='';});
   }
   if (!glMap.getSource('sites3d')) {
-    glMap.addSource('sites3d',{type:'geojson',data:sitesFilteredFC(),cluster:true,clusterRadius:45,clusterMaxZoom:14});
+    glMap.addSource('sites3d',{type:'geojson',data:sitesFilteredFC(),cluster:true,clusterRadius:35,clusterMaxZoom:11});
     glMap.addLayer({id:'sites-clusters',type:'circle',source:'sites3d',filter:['has','point_count'],
       paint:{'circle-color':'#eab308','circle-opacity':0.88,'circle-stroke-width':1,'circle-stroke-color':'rgba(255,255,255,0.25)',
         'circle-radius':['step',['get','point_count'],14,10,17,50,20]}});
