@@ -893,12 +893,9 @@ body {
       <div class="info-section">
         <div class="info-author">Antonio del Giudice</div>
         <div class="info-tag">PhD Research · Royal College of Art</div>
-        <a class="info-link" href="https://pgr.rca-architecture.com/people/antonio-del-giudice" target="_blank">pgr.rca-architecture.com ↗</a>
       </div>
 
       <div class="info-section">
-        <div class="info-section-title" data-i18n="section_abstract">Abstract</div>
-        <div class="info-paper-title">Wasting the Land</div>
         <div class="info-paper-sub">Commoning, grassroots movements, and the struggle against wasting relationships in the Campania region, Italy.</div>
         <div class="info-text">This research examines Italy’s prolonged and complex waste crisis and the marginalisation of the communities most affected by it, conditions that have given rise to grassroots movements advocating for environmental justice. The project seeks to co-produce alternative representational methods for commoning processes (Federici, 2019) and new territorial strategies by working closely with environmental grassroots movements and situated agroecological practices in Campania. Through these collaborations, it aims to develop a counter-narrative to state and corporate neglect, one that is rooted in collective action and a profound connection to the land. In doing so, it demonstrates how community-led responses can offer more sustainable and equitable alternatives to top-down environmental policies.</div>
       </div>
@@ -913,6 +910,7 @@ body {
 
       <div class="info-section">
         <div class="info-text">Ultimately, the project aims to strengthen and support the ongoing efforts of communities on the front lines of socio-environmental conflict in the Campania region. Its collaborative methodology is designed to ensure that the research produces not only academic knowledge but also practical tools and strategies that are directly relevant and valuable to the communities involved.</div>
+        <a class="info-link" href="https://pgr.rca-architecture.com/people/antonio-del-giudice" target="_blank" style="display:inline-block;margin-top:10px;">pgr.rca-architecture.com ↗</a>
       </div>
 
     </div>
@@ -920,10 +918,9 @@ body {
   <!-- Rotation hint (3D mode) -->
   <div id="rotate-hint" data-i18n="rotate_hint">Drag to pan &nbsp;·&nbsp; Right-click drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
   <div id="bm-ctrl">
-    <button class="bm-btn active" id="bm-light" onclick="setBasemap('light')">LIGHT</button>
-    <button class="bm-btn" id="bm-osm"   onclick="setBasemap('osm')">OSM</button>
-    <button class="bm-btn" id="bm-sat"   onclick="setBasemap('sat')">SAT</button>
+    <button class="bm-btn active" id="bm-sat"   onclick="setBasemap('sat')">SAT</button>
     <button class="bm-btn" id="bm-dark"  onclick="setBasemap('dark')">DARK</button>
+    <button class="bm-btn" id="bm-osm"   onclick="setBasemap('osm')">OSM</button>
     <button class="bm-btn" id="bm-maps"  onclick="setBasemap('maps')">MAPS</button>
   </div>
   <a href="mobile.html" id="mob-link" title="Open mobile version">MOBILE</a>
@@ -1069,7 +1066,7 @@ const cartoPos   = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/serv
 const satellite  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
 const cartoDark  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
 
-cartoPosNL.addTo(map);
+satellite.addTo(map);
 L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);
 
 // ── FOOTER HOVER INFO ──
@@ -1433,11 +1430,10 @@ const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
 const mapsTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
   {attribution:'© OpenStreetMap © CARTO', maxZoom:19});
 
-let currentBM = cartoPosNL;
-let currentBMKey = 'light';
-const bmLayers = {light: cartoPosNL, osm: osmTiles, sat: satellite, dark: cartoDark, maps: mapsTiles};
+let currentBM = satellite;
+let currentBMKey = 'sat';
+const bmLayers = {sat: satellite, dark: cartoDark, osm: osmTiles, maps: mapsTiles};
 const bmTiles3d = {
-  light: ['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'],
   osm:   ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
           'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png'],
   sat:   ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
