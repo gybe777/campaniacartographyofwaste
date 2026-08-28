@@ -749,15 +749,18 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
 
 /* Wasted Ecologies = tap to open info panel */
 .hdr-logo {
-  flex: 1 !important;
+  flex: 0 1 auto !important;
   width: auto !important;
   min-width: 0 !important;
+  max-width: 50% !important;
   height: 54px !important;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
   position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* EN + DESKTOP + 3D — top-right buttons */
