@@ -487,6 +487,35 @@ body {
   border-radius: 50%;
   flex-shrink: 0;
 }
+#sb-hover {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--white);
+  letter-spacing: 0.03em;
+  flex: 1;
+  min-width: 0;
+}
+#sb-hover.empty { color: var(--gray2); }
+#sb-hover.empty #sb-hover-comune { display: none; }
+.sb-hover-icon {
+  width: 12px; height: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sb-hover-icon svg { width: 100%; height: 100%; display: block; }
+#sb-hover-title {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-weight: 600;
+}
+#sb-hover-comune {
+  color: var(--gray2);
+  font-weight: 400;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -615,8 +644,8 @@ body {
   color: var(--gray2); margin-bottom: 10px;
 }
 .info-text {
-  font-family: var(--font); font-size: 9.5px; color: var(--gray1);
-  line-height: 1.65;
+  font-family: var(--font); font-size: 11px; color: var(--gray1);
+  line-height: 1.6;
 }
 /* ── 3D ROTATE HINT ── */
 #rotate-hint {
@@ -921,10 +950,12 @@ body {
 <!-- STATUS BAR -->
 <div id="statusbar">
   <div class="sb-dot"></div>
-  <div class="sb-item" data-i18n="sb_arpac">ARPAC Piano Regionale di Bonifica 2018</div>
+  <div id="sb-hover" class="empty">
+    <span class="sb-hover-icon" id="sb-hover-icon"></span>
+    <span id="sb-hover-title" data-i18n="sb_hover_placeholder">Passa il mouse su un elemento della mappa</span>
+    <span id="sb-hover-comune"></span>
+  </div>
   <div class="sb-item"><span data-i18n="sb_visible">Siti visibili:</span> <span id="sb-vis">241</span></div>
-  <div class="sb-item" data-i18n="sb_province">Provincia CE / NA / SA</div>
-  <div class="sb-item">CRS: WGS84 · EPSG:4326</div>
 </div>
 
 <script>
@@ -966,9 +997,8 @@ const I18N = {
     search_placeholder:'Cerca per nome, comune, contaminante...',
     info_title:'Info sul progetto',
     rotate_hint:'Trascina per spostare &nbsp;·&nbsp; Clic destro per ruotare &nbsp;·&nbsp; Rotella per zoom',
-    sb_arpac:'ARPAC Piano Regionale di Bonifica 2018',
     sb_visible:'Siti visibili:',
-    sb_province:'Provincia CE / NA / SA',
+    sb_hover_placeholder:'Passa il mouse su un elemento della mappa',
     section_abstract:'Abstract', section_bio:'Bio',
     p_comune:'Comune', p_tipo:'Tipo', p_codice:'Codice',
     p_suolo:'Suolo', p_acqua:'Acqua', p_stato:'Stato',
@@ -1004,9 +1034,8 @@ const I18N = {
     search_placeholder:'Search by name, municipality, contaminant...',
     info_title:'Project info',
     rotate_hint:'Drag to pan &nbsp;·&nbsp; Right-click drag to rotate &nbsp;·&nbsp; Scroll to zoom',
-    sb_arpac:'ARPAC Regional Remediation Plan 2018',
     sb_visible:'Visible sites:',
-    sb_province:'Province CE / NA / SA',
+    sb_hover_placeholder:'Hover over a map item',
     section_abstract:'Abstract', section_bio:'Bio',
     p_comune:'Municipality', p_tipo:'Type', p_codice:'Code',
     p_suolo:'Soil', p_acqua:'Water', p_stato:'Status',
@@ -1043,6 +1072,39 @@ const cartoDark  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/serv
 cartoPosNL.addTo(map);
 L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);
 
+// ── FOOTER HOVER INFO ──
+const SB_ICONS = {
+  siti:'<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#eab308" opacity="0.9"/></svg>',
+  sver:'<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#dc2626" opacity="0.9"/></svg>',
+  beni:'<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="5" y1="3" x2="5" y2="13" stroke="#a855f7" stroke-width="1.2" opacity="0.6"/><polygon points="5,3 13,6 5,9" fill="#a855f7" opacity="0.5"/></svg>',
+  part:hw=>'<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="10" height="10" fill="'+(hw?'#dc2626':'#78716c')+'" fill-opacity="0.3" stroke="'+(hw?'#dc2626':'#78716c')+'" stroke-width="1.5"/></svg>',
+  comuni:'<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="10" height="10" fill="#0ea5e9" fill-opacity="0.3" stroke="#0ea5e9" stroke-width="1.5"/></svg>'
+};
+function sbHoverSet(iconSvg,title,comune){
+  const wrap=document.getElementById('sb-hover');
+  if(!wrap) return;
+  wrap.classList.remove('empty');
+  const iconEl=document.getElementById('sb-hover-icon');
+  const titleEl=document.getElementById('sb-hover-title');
+  const comuneEl=document.getElementById('sb-hover-comune');
+  iconEl.innerHTML=iconSvg||'';
+  delete titleEl.dataset.i18n;
+  titleEl.textContent=title||'';
+  comuneEl.textContent=comune?('· '+comune):'';
+}
+function sbHoverClear(){
+  const wrap=document.getElementById('sb-hover');
+  if(!wrap) return;
+  wrap.classList.add('empty');
+  const iconEl=document.getElementById('sb-hover-icon');
+  const titleEl=document.getElementById('sb-hover-title');
+  const comuneEl=document.getElementById('sb-hover-comune');
+  iconEl.innerHTML='';
+  titleEl.dataset.i18n='sb_hover_placeholder';
+  titleEl.textContent=T('sb_hover_placeholder');
+  comuneEl.textContent='';
+}
+
 // ── RENDER SITES ──
 function makeClusterIcon(cluster){
   const n=cluster.getChildCount();
@@ -1072,6 +1134,8 @@ SITES.forEach((s,i)=>{
   const m=L.marker([s.lat,s.lon],{
     icon:L.divIcon({className:'',html:'<svg width="10" height="12" viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg" style="display:block"><polygon points="5,12 0,0 10,0" fill="#eab308" opacity="0.9"/></svg>',iconSize:[10,12],iconAnchor:[5,6]})
   }).bindPopup(()=>sitePopupHTML(s),{maxWidth:280});
+  m.on('mouseover',()=>sbHoverSet(SB_ICONS.siti,s.Name,s.Municipality));
+  m.on('mouseout',sbHoverClear);
   m.addTo(markersLg);
   mByIdx.set(i,m);
 });
@@ -1094,6 +1158,8 @@ let beniOn=true;
 BENI.forEach(b=>{
   L.marker([b.lat,b.lon],{icon:L.divIcon({className:'',html:'<svg width="13" height="20" viewBox="0 0 8 13" xmlns="http://www.w3.org/2000/svg" style="display:block"><line x1="2" y1="1" x2="2" y2="12" stroke="#a855f7" stroke-width="1.2" opacity="0.6"/><polygon points="2,1 8,3.5 2,6" fill="#a855f7" opacity="0.5"/></svg>',iconSize:[13,20],iconAnchor:[2,20]})})
     .bindPopup(()=>beniPopupHTML(b))
+    .on('mouseover',()=>sbHoverSet(SB_ICONS.beni,T('p_bene')+' #'+b.props.id))
+    .on('mouseout',sbHoverClear)
     .addTo(beniLg);
 });
 beniLg.addTo(map);
@@ -1104,6 +1170,8 @@ let comuniOn=true;
 COMUNI.forEach(c=>{
   L.polygon(c.rings,{color:'#0ea5e9',weight:1.5,fillColor:'#0ea5e9',fillOpacity:0.15})
     .bindPopup(()=>comuniPopupHTML(c))
+    .on('mouseover',()=>sbHoverSet(SB_ICONS.comuni,c.props.comune||T('p_comune')))
+    .on('mouseout',sbHoverClear)
     .addTo(comuniLg);
 });
 comuniLg.addTo(map);
@@ -1115,6 +1183,8 @@ PARTICELLE.forEach(p=>{
   const hw=(p.props.rifiuti==='SI');
   L.polygon(p.rings,{color:hw?'#dc2626':'#78716c',weight:1,fillColor:hw?'#dc2626':'#78716c',fillOpacity:0.25})
     .bindPopup(()=>particellePopupHTML(p))
+    .on('mouseover',()=>sbHoverSet(SB_ICONS.part(hw),T('p_particella')))
+    .on('mouseout',sbHoverClear)
     .addTo(partLg);
 });
 partLg.addTo(map);
@@ -1147,6 +1217,8 @@ SVERSAMENTI.forEach(v=>{
     icon:L.divIcon({className:'',html:'<svg width="10" height="12" viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg" style="display:block"><polygon points="5,12 0,0 10,0" fill="#dc2626" opacity="'+(cleared?0.45:0.9)+'"/></svg>',iconSize:[10,12],iconAnchor:[5,6]})
   })
     .bindPopup(()=>sverPopupHTML(v))
+    .on('mouseover',()=>sbHoverSet(SB_ICONS.sver,T('p_sver'),v.props.comune))
+    .on('mouseout',sbHoverClear)
     .addTo(sverLg);
 });
 sverLg.addTo(map);
@@ -1481,7 +1553,8 @@ function addTerrainAndData() {
         .setLngLat(e.lngLat).setHTML(comuniPopupHTML({props:e.features[0].properties})).addTo(glMap);
     });
     glMap.on('mouseenter','comuni-fill',()=>{glMap.getCanvas().style.cursor='pointer';});
-    glMap.on('mouseleave','comuni-fill',()=>{glMap.getCanvas().style.cursor='';});
+    glMap.on('mouseleave','comuni-fill',()=>{glMap.getCanvas().style.cursor='';sbHoverClear();});
+    glMap.on('mousemove','comuni-fill',e=>{const p=e.features[0].properties;sbHoverSet(SB_ICONS.comuni,p.comune||T('p_comune'));});
   }
   if (!glMap.getSource('particelle')) {
     const partFC = {type:'FeatureCollection', features: PARTICELLE.map(p=>({
@@ -1496,7 +1569,8 @@ function addTerrainAndData() {
         .setLngLat(e.lngLat).setHTML(particellePopupHTML({props:e.features[0].properties})).addTo(glMap);
     });
     glMap.on('mouseenter','part-fill',()=>{glMap.getCanvas().style.cursor='pointer';});
-    glMap.on('mouseleave','part-fill',()=>{glMap.getCanvas().style.cursor='';});
+    glMap.on('mouseleave','part-fill',()=>{glMap.getCanvas().style.cursor='';sbHoverClear();});
+    glMap.on('mousemove','part-fill',e=>{const p=e.features[0].properties;sbHoverSet(SB_ICONS.part(p.rifiuti==='SI'),T('p_particella'));});
   }
   if (!glMap.getSource('shp')) {
     const shpFeat=[];
@@ -1545,7 +1619,8 @@ function addTerrainAndData() {
         .setLngLat(e.lngLat).setHTML(beniPopupHTML({props:e.features[0].properties})).addTo(glMap);
     });
     glMap.on('mouseenter','beni-pts',()=>{glMap.getCanvas().style.cursor='pointer';});
-    glMap.on('mouseleave','beni-pts',()=>{glMap.getCanvas().style.cursor='';});
+    glMap.on('mouseleave','beni-pts',()=>{glMap.getCanvas().style.cursor='';sbHoverClear();});
+    glMap.on('mousemove','beni-pts',e=>{const p=e.features[0].properties;sbHoverSet(SB_ICONS.beni,T('p_bene')+' #'+p.id);});
   }
   // Register downward-arrow SDF icon (white silhouette; color applied via paint) — shared by sver + siti, matching 2D triangle markers
   if(!glMap.hasImage('arrow-down')){
@@ -1589,7 +1664,8 @@ function addTerrainAndData() {
         .setLngLat(e.lngLat).setHTML(sverPopupHTML({props:e.features[0].properties})).addTo(glMap);
     });
     glMap.on('mouseenter','sver-pts',()=>{glMap.getCanvas().style.cursor='pointer';});
-    glMap.on('mouseleave','sver-pts',()=>{glMap.getCanvas().style.cursor='';});
+    glMap.on('mouseleave','sver-pts',()=>{glMap.getCanvas().style.cursor='';sbHoverClear();});
+    glMap.on('mousemove','sver-pts',e=>{const p=e.features[0].properties;sbHoverSet(SB_ICONS.sver,T('p_sver'),p.comune);});
   }
   if (!glMap.getSource('sites3d')) {
     glMap.addSource('sites3d',{type:'geojson',data:sitesFilteredFC(),cluster:true,clusterRadius:35,clusterMaxZoom:11});
@@ -1621,7 +1697,8 @@ function addTerrainAndData() {
         .setLngLat(e.lngLat).setHTML(sitePopupHTML(e.features[0].properties)).addTo(glMap);
     });
     glMap.on('mouseenter','sites-pts',()=>{glMap.getCanvas().style.cursor='pointer';});
-    glMap.on('mouseleave','sites-pts',()=>{glMap.getCanvas().style.cursor='';});
+    glMap.on('mouseleave','sites-pts',()=>{glMap.getCanvas().style.cursor='';sbHoverClear();});
+    glMap.on('mousemove','sites-pts',e=>{const p=e.features[0].properties;sbHoverSet(SB_ICONS.siti,p.Name,p.Municipality);});
   }
   glMap.on('rotate',()=>updateNorthArrow(glMap.getBearing()));
 }
