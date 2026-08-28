@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <link href='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css' rel='stylesheet'/>
 <script src='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js'></script>
 <style>
@@ -194,6 +196,34 @@ body {
 .layer-row.off .lr-name { color: var(--gray3); }
 .layer-row.off .lr-chevron { color: var(--gray3); }
 .layer-row.off .lr-indicator { opacity: 0.3; }
+.layer-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+}
+.layer-toggle-row:hover { background: var(--mid); }
+.layer-toggle-label {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--gray1);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.layer-toggle-box {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--gray2);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.layer-toggle-box.checked { background: var(--red); border-color: var(--red); }
+.layer-toggle-box svg { display: none; width: 11px; height: 11px; }
+.layer-toggle-box.checked svg { display: block; }
+
 
 .lr-indicator {
   width: 3px;
@@ -693,7 +723,7 @@ body {
 
       <!-- 1. SVERSAMENTI ABUSIVI -->
       <div class="layer-section">
-        <div class="layer-row" id="row-sver" onclick="toggleLayer('sver', this)">
+        <div class="layer-row" id="row-sver" onclick="toggleExpand('sver')">
           <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#dc2626" opacity="0.9"/></svg></div>
           <span class="lr-name" data-i18n="layer_sver">Sversamenti Abusivi</span>
           <span class="lr-count">276</span>
@@ -701,6 +731,7 @@ body {
         </div>
         <div class="layer-expand" id="exp-sver">
           <div class="expand-desc" data-i18n="desc_sver">Siti di sversamento abusivo di rifiuti individuati dalla Task Force Carabinieri — DPCM 14.03.2025 (Napoli e Caserta).</div>
+          <div class="layer-toggle-row" onclick="toggleLayerVisibility('sver')"><span class="layer-toggle-label" data-i18n="toggle_show">Mostra sulla mappa</span><div class="layer-toggle-box checked" id="tick-sver"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
         </div>
       </div>
 
@@ -720,7 +751,7 @@ body {
 
       <!-- 3. BENI AGRICOLI -->
       <div class="layer-section">
-        <div class="layer-row" id="row-beni" onclick="toggleLayer('beni', this)">
+        <div class="layer-row" id="row-beni" onclick="toggleExpand('beni')">
           <div class="lr-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <line x1="8" y1="14" x2="8" y2="6" stroke="#a855f7" stroke-width="1.4" stroke-linecap="round"/>
             <ellipse cx="8" cy="4" rx="2" ry="2.2" fill="#a855f7" opacity="0.9"/>
@@ -734,12 +765,13 @@ body {
         </div>
         <div class="layer-expand" id="exp-beni">
           <div class="expand-desc" data-i18n="desc_beni">Terreni agricoli sequestrati alla criminalità organizzata nella Regione Campania.</div>
+          <div class="layer-toggle-row" onclick="toggleLayerVisibility('beni')"><span class="layer-toggle-label" data-i18n="toggle_show">Mostra sulla mappa</span><div class="layer-toggle-box checked" id="tick-beni"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
         </div>
       </div>
 
       <!-- 4. PARTICELLE CLASSIFICATE -->
       <div class="layer-section">
-        <div class="layer-row" id="row-part" onclick="toggleLayer('part', this)">
+        <div class="layer-row" id="row-part" onclick="toggleExpand('part')">
           <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="10" height="10" fill="#dc2626" fill-opacity="0.3" stroke="#dc2626" stroke-width="1.5"/></svg></div>
           <span class="lr-name" data-i18n="layer_part">Particelle Classificate</span>
           <span class="lr-count">642</span>
@@ -747,13 +779,14 @@ body {
         </div>
         <div class="layer-expand" id="exp-part">
           <div class="expand-desc" data-i18n="desc_part">Classificazione ai sensi del D.M. 12/02/2015 (G.U. 09/03/2015 n. 56). Parcelle contrassegnate per presenza di rifiuti.</div>
+          <div class="layer-toggle-row" onclick="toggleLayerVisibility('part')"><span class="layer-toggle-label" data-i18n="toggle_show">Mostra sulla mappa</span><div class="layer-toggle-box checked" id="tick-part"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
         </div>
       </div>
 
 
       <!-- 5. COMUNI INDAGATI -->
       <div class="layer-section">
-        <div class="layer-row" id="row-comuni" onclick="toggleLayer('comuni', this)">
+        <div class="layer-row" id="row-comuni" onclick="toggleExpand('comuni')">
           <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="10" height="10" fill="#0ea5e9" fill-opacity="0.3" stroke="#0ea5e9" stroke-width="1.5"/></svg></div>
           <span class="lr-name" data-i18n="layer_comuni">Comuni Indagati</span>
           <span class="lr-count">70</span>
@@ -761,6 +794,7 @@ body {
         </div>
         <div class="layer-expand" id="exp-comuni">
           <div class="expand-desc" data-i18n="desc_comuni">Comuni compresi nell'area di indagine della Terra dei Fuochi e zone limitrofe.</div>
+          <div class="layer-toggle-row" onclick="toggleLayerVisibility('comuni')"><span class="layer-toggle-label" data-i18n="toggle_show">Mostra sulla mappa</span><div class="layer-toggle-box checked" id="tick-comuni"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
         </div>
       </div>
 
@@ -927,6 +961,7 @@ const I18N = {
     p_decreto:'Decreto', p_id:'ID',
     p_bene:'Bene Agricolo Confiscato', p_particella:'Particella Classificata',
     p_sver:'Sversamento Abusivo', p_indirizzo:'Indirizzo', p_data:'Data identificazione', p_link:'Scheda sito ↗',
+    toggle_show:'Mostra sulla mappa',
     yes:'SÌ', no:'NO',
     more_results:'altri risultati',
     cat_ind:'Industriale / Produttivo', cat_carb:'Carburanti / Idrocarburi',
@@ -964,6 +999,7 @@ const I18N = {
     p_decreto:'Decree', p_id:'ID',
     p_bene:'Confiscated Agricultural Asset', p_particella:'Classified Parcel',
     p_sver:'Illegal Dumping Site', p_indirizzo:'Address', p_data:'Identification date', p_link:'Site record ↗',
+    toggle_show:'Show on map',
     yes:'YES', no:'NO',
     more_results:'more results',
     cat_ind:'Industrial / Productive', cat_carb:'Fuel / Hydrocarbons',
@@ -993,7 +1029,26 @@ cartoPosNL.addTo(map);
 L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);
 
 // ── RENDER SITES ──
-const markersLg=L.layerGroup().addTo(map);
+function makeClusterIcon(cluster){
+  const n=cluster.getChildCount();
+  const size=n<10?28:n<50?34:40;
+  return L.divIcon({
+    html:'<div style="width:'+size+'px;height:'+size+'px;background:#eab308;border:1px solid rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:700;color:#1c1a18;opacity:0.9;">'+n+'</div>',
+    className:'',iconSize:[size,size],iconAnchor:[size/2,size/2]
+  });
+}
+let markersLg;
+try {
+  markersLg=L.markerClusterGroup({
+    maxClusterRadius:45, spiderfyOnMaxZoom:true,
+    showCoverageOnHover:false, zoomToBoundsOnClick:true,
+    iconCreateFunction:makeClusterIcon
+  });
+} catch(e) {
+  console.warn('markercluster unavailable, falling back to layerGroup');
+  markersLg=L.layerGroup();
+}
+markersLg.addTo(map);
 const mByIdx=new Map();
 function getCat(type){return TYPE_TO_CAT[type]||'Dismesso / Ex-Industriale';}
 function getColor(type){const cat=getCat(type);return(CATEGORIES[cat]||{color:'#888'}).color;}
@@ -1008,11 +1063,12 @@ SITES.forEach((s,i)=>{
 
 // ── RENDER SHP POLYGONS ──
 const shpColors={landfill:'#EE4238','masseria ferraioli':'#f97316','ecoballe acerr':'#eab308'};
+const shpLg=L.layerGroup().addTo(map);
 Object.entries(SHP_DATA).forEach(([name,polys])=>{
   polys.forEach(p=>{
     if(p.type==='polygon'){
       L.polygon(p.rings,{color:shpColors[name]||'#EE4238',weight:2,fillOpacity:0.3,fillColor:shpColors[name]||'#EE4238'})
-        .bindPopup('<div class="popup-wrap"><div class="popup-title">'+name+'</div></div>').addTo(markersLg);
+        .bindPopup('<div class="popup-wrap"><div class="popup-title">'+name+'</div></div>').addTo(shpLg);
     }
   });
 });
@@ -1116,19 +1172,17 @@ const layerMap={
   sver:  {lg:sverLg,   getOn:()=>sverOn,   setOn:(v)=>{ sverOn=v; }}
 };
 
-function toggleLayer(id, rowEl) {
+function toggleLayerVisibility(id) {
   const lm=layerMap[id];
   if(!lm) return;
   const newState=!lm.getOn();
   lm.setOn(newState);
-  rowEl.classList.toggle('off',!newState);
-  newState?lm.lg.addTo(map):map.removeLayer(lm.lg);
-  // toggle expand on click
-  const exp=document.getElementById('exp-'+id);
-  if(exp) {
-    const isOpen=exp.classList.toggle('open');
-    rowEl.classList.toggle('expanded',isOpen);
-  }
+  const row=document.getElementById('row-'+id);
+  if(row) row.classList.toggle('off',!newState);
+  if(newState){ lm.lg.addTo(map); if(lm.onAdd) lm.onAdd(); }
+  else map.removeLayer(lm.lg);
+  const tick=document.getElementById('tick-'+id);
+  if(tick) tick.classList.toggle('checked', newState);
 }
 
 // ── TAB SWITCHING ──
@@ -1211,6 +1265,10 @@ function resetAll() {
   document.getElementById('row-comuni').classList.remove('off');
   document.getElementById('row-part').classList.remove('off');
   document.getElementById('row-sver').classList.remove('off');
+  document.getElementById('tick-sver').classList.add('checked');
+  document.getElementById('tick-beni').classList.add('checked');
+  document.getElementById('tick-part').classList.add('checked');
+  document.getElementById('tick-comuni').classList.add('checked');
   applyFilters();
 }
 
