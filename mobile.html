@@ -918,7 +918,20 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
         <button class="reset-btn" onclick="resetAll()" data-i18n="reset">Reset</button>
       </div>
 
-      <!-- 1. SITI CONTAMINATI (expandable with sub-categories) -->
+      <!-- 1. SVERSAMENTI ABUSIVI -->
+      <div class="layer-section">
+        <div class="layer-row" id="row-sver" onclick="toggleLayer('sver', this)">
+          <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#dc2626" fill-opacity="0.4" stroke="#dc2626" stroke-width="1.2"/></svg></div>
+          <span class="lr-name" data-i18n="layer_sver">Sversamenti Abusivi</span>
+          <span class="lr-count">276</span>
+          <span class="lr-chevron">›</span>
+        </div>
+        <div class="layer-expand" id="exp-sver">
+          <div class="expand-desc" data-i18n="desc_sver">Siti di sversamento abusivo di rifiuti individuati dalla Task Force Carabinieri — DPCM 14.03.2025 (Napoli e Caserta).</div>
+        </div>
+      </div>
+
+      <!-- 2. SITI CONTAMINATI (expandable with sub-categories) -->
       <div class="layer-section" id="section-siti">
         <div class="layer-row active" id="row-siti" onclick="toggleExpand('siti')">
           <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#eab308" opacity="0.9"/></svg></div>
@@ -932,7 +945,7 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
         </div>
       </div>
 
-      <!-- 2. BENI AGRICOLI -->
+      <!-- 3. BENI AGRICOLI -->
       <div class="layer-section">
         <div class="layer-row" id="row-beni" onclick="toggleLayer('beni', this)">
           <div class="lr-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -945,19 +958,6 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
         </div>
         <div class="layer-expand" id="exp-beni">
           <div class="expand-desc" data-i18n="desc_beni">Terreni agricoli sequestrati alla criminalità organizzata nella Regione Campania.</div>
-        </div>
-      </div>
-
-      <!-- 3. COMUNI INDAGATI -->
-      <div class="layer-section">
-        <div class="layer-row" id="row-comuni" onclick="toggleLayer('comuni', this)">
-          <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="10" height="10" fill="#0ea5e9" fill-opacity="0.3" stroke="#0ea5e9" stroke-width="1.5"/></svg></div>
-          <span class="lr-name" data-i18n="layer_comuni">Comuni Indagati</span>
-          <span class="lr-count">70</span>
-          <span class="lr-chevron">›</span>
-        </div>
-        <div class="layer-expand" id="exp-comuni">
-          <div class="expand-desc" data-i18n="desc_comuni">Comuni compresi nell'area di indagine della Terra dei Fuochi e zone limitrofe.</div>
         </div>
       </div>
 
@@ -974,7 +974,20 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
         </div>
       </div>
 
-      <!-- 5. SITI SPECIFICI -->
+      <!-- 5. COMUNI INDAGATI -->
+      <div class="layer-section">
+        <div class="layer-row" id="row-comuni" onclick="toggleLayer('comuni', this)">
+          <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="10" height="10" fill="#0ea5e9" fill-opacity="0.3" stroke="#0ea5e9" stroke-width="1.5"/></svg></div>
+          <span class="lr-name" data-i18n="layer_comuni">Comuni Indagati</span>
+          <span class="lr-count">70</span>
+          <span class="lr-chevron">›</span>
+        </div>
+        <div class="layer-expand" id="exp-comuni">
+          <div class="expand-desc" data-i18n="desc_comuni">Comuni compresi nell'area di indagine della Terra dei Fuochi e zone limitrofe.</div>
+        </div>
+      </div>
+
+      <!-- 6. SITI SPECIFICI -->
       <div class="layer-section">
         <div class="layer-row" id="row-spec" onclick="toggleExpand('spec')">
           <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="10" height="10" fill="#f97316" fill-opacity="0.3" stroke="#f97316" stroke-width="1.5"/></svg></div>
@@ -988,19 +1001,6 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
         </div>
       </div>
 
-
-      <!-- 6. SVERSAMENTI ABUSIVI -->
-      <div class="layer-section">
-        <div class="layer-row" id="row-sver" onclick="toggleLayer('sver', this)">
-          <div class="lr-icon"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><polygon points="8,14 15,2 1,2" fill="#dc2626" fill-opacity="0.4" stroke="#dc2626" stroke-width="1.2"/></svg></div>
-          <span class="lr-name" data-i18n="layer_sver">Sversamenti Abusivi</span>
-          <span class="lr-count">276</span>
-          <span class="lr-chevron">›</span>
-        </div>
-        <div class="layer-expand" id="exp-sver">
-          <div class="expand-desc" data-i18n="desc_sver">Siti di sversamento abusivo di rifiuti individuati dalla Task Force Carabinieri — DPCM 14.03.2025 (Napoli e Caserta).</div>
-        </div>
-      </div>
 
       <!-- 7. TERREMOTI (USGS) -->
       <div class="layer-section">
