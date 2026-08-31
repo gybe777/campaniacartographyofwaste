@@ -600,13 +600,13 @@ body {
   cursor: pointer; transition: all 0.15s; user-select: none;
 }
 #info-btn:hover { color: var(--white); border-color: var(--gray2); }
-#info-panel {
+#info-panel, #readme-panel {
   position: absolute; inset: 0;
   background: var(--dark); z-index: 20;
   display: none; flex-direction: column; gap: 0;
   overflow: hidden;
 }
-#info-panel.open { display: flex; }
+#info-panel.open, #readme-panel.open { display: flex; }
 .info-hdr {
   display: flex; align-items: center; justify-content: flex-end;
   padding: 10px 12px 8px; border-bottom: 1px solid var(--border);
@@ -946,7 +946,7 @@ body.mode-3d #bm-ctrl { right: auto; left: 10px; }
 }
 
 /* ── INFO PANEL: matches sidebar's glass card ── */
-#info-panel {
+#info-panel, #readme-panel {
   background: rgba(24,22,20,0.97) !important;
   backdrop-filter: blur(26px) saturate(170%);
   -webkit-backdrop-filter: blur(26px) saturate(170%);
@@ -1037,7 +1037,8 @@ body.bm-maps #statusbar {
   background: rgba(200,200,200,0.08) !important;
 }
 body.bm-maps #sidebar,
-body.bm-maps #info-panel {
+body.bm-maps #info-panel,
+body.bm-maps #readme-panel {
   background: rgba(40,38,36,0.97) !important;
 }
 body.bm-maps .hdr-logo,
@@ -1159,6 +1160,7 @@ body.bm-maps .leaflet-control-scale { background: rgba(200,200,200,0.12) !import
     <button class="btn-3d" id="btn-lang" onclick="toggleLang()" title="Switch language" style="margin-right:4px">EN</button>
     <a href="index.html" class="btn-3d" id="mob-link" title="Open desktop version" style="margin-right:4px; text-decoration:none; -webkit-appearance:none; touch-action:manipulation;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><rect x="1" y="2" width="18" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 17h6M10 14v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
     <button class="btn-3d" id="btn-3d" onclick="toggle3D()" title="Toggle 3D terrain view">3D</button>
+    <button class="btn-3d" id="btn-readme" onclick="mobReadmeInfo()" data-i18n-title="readme_title" title="Read me">README</button>
   </div>
 </div>
 
@@ -1194,6 +1196,28 @@ body.bm-maps .leaflet-control-scale { background: rgba(200,200,200,0.12) !import
       <div class="info-section">
         <div class="info-text" data-i18n="info_p4">In definitiva, il progetto mira a rafforzare e sostenere gli sforzi in corso delle comunità in prima linea nel conflitto socio-ambientale in Campania. La sua metodologia collaborativa è pensata per garantire che la ricerca produca non solo conoscenza accademica, ma anche strumenti e strategie pratiche direttamente rilevanti e utili per le comunità coinvolte.</div>
         <a class="info-link" href="https://pgr.rca-architecture.com/people/antonio-del-giudice" target="_blank" style="display:inline-block;margin-top:10px;">pgr.rca-architecture.com ↗</a>
+      </div>
+
+    </div>
+  </div>
+  <!-- Read Me panel: usage/consent notice, same overlay card as the WL info panel -->
+  <div id="readme-panel">
+    <div class="info-hdr">
+      <button class="info-close" onclick="toggleReadme()">×</button>
+    </div>
+    <div class="info-body">
+
+      <div class="info-section">
+        <div class="info-text" data-i18n="readme_p1">Questa piattaforma cartografica è un esercizio di visualizzazione ancora in corso di sviluppo (work in progress), realizzato principalmente per finalità di ricerca e per l'utilizzo in workshop di facilitazione con le persone e gli informatori selezionati dal ricercatore di dottorato Antonio del Giudice.</div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-text" data-i18n="readme_p2">Le informazioni geografiche e lo stato ambientale dei siti rappresentati sono raccolti da fonti terze — tra cui ARPAC, l'Arma dei Carabinieri e CampaniaGIS — e sono riportati a fini esclusivamente informativi e di ricerca.</div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-text" data-i18n="readme_p3">Si prega di non diffondere, pubblicare o ridistribuire questo strumento senza il consenso esplicito dell'autore/ricercatore. Per richieste relative a divulgazione, utilizzo didattico o collaborazioni, contattare:</div>
+        <a class="info-link" href="mailto:antonio.delgiudice@network.rca.ac.uk" style="display:inline-block;margin-top:10px;">antonio.delgiudice@network.rca.ac.uk</a>
       </div>
 
     </div>
@@ -1436,6 +1460,10 @@ const I18N = {
     desc_spec:'Siti di smaltimento e stoccaggio con perimetro noto.',
     search_placeholder:'Cerca per nome, comune, contaminante...',
     info_title:'Info sul progetto',
+    readme_title:'Leggimi',
+    readme_p1:`Questa piattaforma cartografica è un esercizio di visualizzazione ancora in corso di sviluppo (work in progress), realizzato principalmente per finalità di ricerca e per l'utilizzo in workshop di facilitazione con le persone e gli informatori selezionati dal ricercatore di dottorato Antonio del Giudice.`,
+    readme_p2:`Le informazioni geografiche e lo stato ambientale dei siti rappresentati sono raccolti da fonti terze — tra cui ARPAC, l'Arma dei Carabinieri e CampaniaGIS — e sono riportati a fini esclusivamente informativi e di ricerca.`,
+    readme_p3:`Si prega di non diffondere, pubblicare o ridistribuire questo strumento senza il consenso esplicito dell'autore/ricercatore. Per richieste relative a divulgazione, utilizzo didattico o collaborazioni, contattare:`,
     rotate_hint:'Trascina per spostare &nbsp;·&nbsp; Clic destro per ruotare &nbsp;·&nbsp; Rotella per zoom',
     sb_visible:'Siti visibili:',
     sb_hover_placeholder:'Tocca un elemento della mappa',
@@ -1483,6 +1511,10 @@ const I18N = {
     desc_spec:'Disposal and storage sites with a known perimeter.',
     search_placeholder:'Search by name, municipality, contaminant...',
     info_title:'Project info',
+    readme_title:'Read me',
+    readme_p1:`This mapping platform is a work-in-progress visualisation exercise, developed primarily for research purposes and for use in facilitation workshops with the participants and informants selected by the PhD researcher, Antonio del Giudice.`,
+    readme_p2:`The geographic information and environmental status of the sites shown are compiled from third-party sources — including ARPAC, the Carabinieri, and CampaniaGIS — and are presented for research and informational purposes only.`,
+    readme_p3:`Please do not circulate, publish, or redistribute this tool without the explicit consent of the author/researcher. For enquiries regarding dissemination, educational use, or collaboration, please contact:`,
     rotate_hint:'Drag to pan &nbsp;·&nbsp; Right-click drag to rotate &nbsp;·&nbsp; Scroll to zoom',
     sb_visible:'Visible sites:',
     sb_hover_placeholder:'Tap a map item',
@@ -1988,6 +2020,10 @@ function toggleInfo() {
   document.getElementById('info-panel').classList.toggle('open');
 }
 
+function toggleReadme() {
+  document.getElementById('readme-panel').classList.toggle('open');
+}
+
 function toggle3D() {
   map3dOn = !map3dOn;
   const btn    = document.getElementById('btn-3d');
@@ -2024,7 +2060,7 @@ function addTerrainAndData() {
       encoding: 'terrarium', tileSize: 256, maxzoom: 14
     });
   }
-  glMap.setTerrain({ source: 'terrain', exaggeration: 2.5 });
+  glMap.setTerrain({ source: 'terrain', exaggeration: 1.25 });
 
   glMap.addLayer({ id:'sky', type:'sky', paint:{
     'sky-type':'atmosphere','sky-atmosphere-sun':[0.0,60.0],
@@ -2298,6 +2334,7 @@ function mobTogglePanel() {
 function mobOpenSearch() {
   var sb    = document.getElementById('sidebar');
   var panel = document.getElementById('info-panel');
+  var readme = document.getElementById('readme-panel');
   var logo  = document.getElementById('mob-logo');
   if (!sb) return;
   var infoOpen = panel && panel.classList.contains('open');
@@ -2310,6 +2347,7 @@ function mobOpenSearch() {
     return;
   }
   if (panel) panel.classList.remove('open');
+  if (readme) readme.classList.remove('open');
   sb.classList.add('mob-open', 'mode-search');
   sb.classList.remove('mode-layers');
   if (logo) logo.classList.add('mob-open');
@@ -2323,6 +2361,7 @@ function mobOpenSearch() {
 function mobOpenLayers() {
   var sb    = document.getElementById('sidebar');
   var panel = document.getElementById('info-panel');
+  var readme = document.getElementById('readme-panel');
   var logo  = document.getElementById('mob-logo');
   if (!sb) return;
   var infoOpen = panel && panel.classList.contains('open');
@@ -2333,6 +2372,7 @@ function mobOpenLayers() {
     return;
   }
   if (panel) panel.classList.remove('open');
+  if (readme) readme.classList.remove('open');
   sb.classList.add('mob-open', 'mode-layers');
   sb.classList.remove('mode-search');
   if (logo) logo.classList.add('mob-open');
@@ -2345,10 +2385,32 @@ function mobOpenLayers() {
 function mobLogoInfo() {
   var sb    = document.getElementById('sidebar');
   var panel = document.getElementById('info-panel');
+  var readme = document.getElementById('readme-panel');
   var logo  = document.getElementById('mob-logo');
   if (!sb || !panel) return;
   var infoShowing = sb.classList.contains('mob-open') && panel.classList.contains('open');
+  if (readme) readme.classList.remove('open');
   if (infoShowing) {
+    sb.classList.remove('mob-open');
+    if (logo) logo.classList.remove('mob-open');
+    panel.classList.remove('open');
+    return;
+  }
+  sb.classList.add('mob-open');
+  if (logo) logo.classList.add('mob-open');
+  panel.classList.add('open');
+}
+
+/* ── MOBILE: README shows the usage/consent notice, same pattern as WL ── */
+function mobReadmeInfo() {
+  var sb     = document.getElementById('sidebar');
+  var panel  = document.getElementById('readme-panel');
+  var other  = document.getElementById('info-panel');
+  var logo   = document.getElementById('mob-logo');
+  if (!sb || !panel) return;
+  var readmeShowing = sb.classList.contains('mob-open') && panel.classList.contains('open');
+  if (other) other.classList.remove('open');
+  if (readmeShowing) {
     sb.classList.remove('mob-open');
     if (logo) logo.classList.remove('mob-open');
     panel.classList.remove('open');
@@ -2376,12 +2438,14 @@ document.addEventListener('DOMContentLoaded', function() {
   var mapOuter = document.getElementById('map-outer');
   if (mapOuter) {
     mapOuter.addEventListener('click', function() {
-      var sb    = document.getElementById('sidebar');
-      var logo  = document.getElementById('mob-logo');
-      var panel = document.getElementById('info-panel');
-      if (sb)    sb.classList.remove('mob-open');
-      if (logo)  logo.classList.remove('mob-open');
-      if (panel) panel.classList.remove('open');
+      var sb     = document.getElementById('sidebar');
+      var logo   = document.getElementById('mob-logo');
+      var panel  = document.getElementById('info-panel');
+      var readme = document.getElementById('readme-panel');
+      if (sb)     sb.classList.remove('mob-open');
+      if (logo)   logo.classList.remove('mob-open');
+      if (panel)  panel.classList.remove('open');
+      if (readme) readme.classList.remove('open');
     });
   }
 });

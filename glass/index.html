@@ -594,14 +594,14 @@ body {
   cursor: pointer; transition: all 0.15s; user-select: none;
 }
 #info-btn:hover { color: var(--white); border-color: var(--gray2); }
-#info-panel {
+#info-panel, #readme-panel {
   position: absolute; top: 40px; right: 4px;
   width: 270px; background: var(--black);
   border: 1px solid var(--border); z-index: 1000;
   display: none; flex-direction: column; gap: 0;
   max-height: calc(100vh - 120px);
 }
-#info-panel.open { display: flex; }
+#info-panel.open, #readme-panel.open { display: flex; }
 .info-hdr {
   display: flex; align-items: center; justify-content: flex-end;
   padding: 10px 12px 8px; border-bottom: 1px solid var(--border);
@@ -887,7 +887,7 @@ body {
 }
 
 /* ── INFO PANEL: same floating glass card + slide effect as the layers/search sidebar, same left slot ── */
-#info-panel {
+#info-panel, #readme-panel {
   position: absolute; top: 74px; left: 12px; right: auto; width: 280px;
   height: auto;
   max-height: calc(100vh - 74px - 220px);
@@ -903,7 +903,7 @@ body {
   display: flex;
   transition: width 0.22s ease, opacity 0.18s ease, border-color 0.22s ease;
 }
-#info-panel.collapsed {
+#info-panel.collapsed, #readme-panel.collapsed {
   width: 280px !important;
   opacity: 0 !important;
   transform: translateX(-16px);
@@ -1075,7 +1075,8 @@ body.bm-maps #statusbar {
   background: rgba(200,200,200,0.08) !important;
 }
 body.bm-maps #sidebar,
-body.bm-maps #info-panel {
+body.bm-maps #info-panel,
+body.bm-maps #readme-panel {
   background: rgba(200,200,200,0.14) !important;
 }
 body.bm-maps .btn-3d,
@@ -1105,7 +1106,7 @@ body.bm-maps .bm-btn.active {
   html, body { background: #fff !important; }
 
   /* hide every piece of interactive chrome, including the decorative on-screen north arrow */
-  #header, #hdr-logo-btn, #sidebar, #info-panel, #statusbar,
+  #header, #hdr-logo-btn, #sidebar, #info-panel, #readme-panel, #statusbar,
   .leaflet-control-zoom, #bm-ctrl, .leaflet-control-minimap,
   .maplibregl-ctrl-top-right, #rotate-hint, #print-btn, #info-btn,
   #north-arrow {
@@ -1185,6 +1186,7 @@ body.bm-maps .bm-btn.active {
     <div class="hdr-count"><span data-i18n="hdr_visible">Visibili:</span> <span id="hdr-vis">1250</span> / <span id="hdr-tot">1250</span></div>
     <button class="btn-3d" id="btn-lang" onclick="toggleLang()" title="Switch language">EN</button>
     <button class="btn-3d" id="btn-3d" onclick="toggle3D()" title="Toggle 3D terrain view">3D</button>
+    <button class="btn-3d" id="btn-readme" onclick="toggleReadme()" data-i18n-title="readme_title" title="Read me">README</button>
   </div>
 </div>
 
@@ -1337,6 +1339,28 @@ body.bm-maps .bm-btn.active {
 
     </div>
   </div>
+  <!-- Read Me panel: usage/consent notice, same glass panel as the WL info panel -->
+  <div id="readme-panel" class="collapsed">
+    <div class="info-hdr">
+      <button class="info-close" onclick="toggleReadme()">×</button>
+    </div>
+    <div class="info-body">
+
+      <div class="info-section">
+        <div class="info-text" data-i18n="readme_p1">Questa piattaforma cartografica è un esercizio di visualizzazione ancora in corso di sviluppo (work in progress), realizzato principalmente per finalità di ricerca e per l'utilizzo in workshop di facilitazione con le persone e gli informatori selezionati dal ricercatore di dottorato Antonio del Giudice.</div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-text" data-i18n="readme_p2">Le informazioni geografiche e lo stato ambientale dei siti rappresentati sono raccolti da fonti terze — tra cui ARPAC, l'Arma dei Carabinieri e CampaniaGIS — e sono riportati a fini esclusivamente informativi e di ricerca.</div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-text" data-i18n="readme_p3">Si prega di non diffondere, pubblicare o ridistribuire questo strumento senza il consenso esplicito dell'autore/ricercatore. Per richieste relative a divulgazione, utilizzo didattico o collaborazioni, contattare:</div>
+        <a class="info-link" href="mailto:antonio.delgiudice@network.rca.ac.uk" style="display:inline-block;margin-top:10px;">antonio.delgiudice@network.rca.ac.uk</a>
+      </div>
+
+    </div>
+  </div>
   <!-- Rotation hint (3D mode) -->
   <div id="rotate-hint" data-i18n="rotate_hint">Drag to pan &nbsp;·&nbsp; Right-click drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
   <div id="bm-ctrl">
@@ -1427,6 +1451,10 @@ const I18N = {
     desc_spec:'Siti di smaltimento e stoccaggio con perimetro noto.',
     search_placeholder:'Cerca per nome, comune, contaminante...',
     info_title:'Info sul progetto',
+    readme_title:'Leggimi',
+    readme_p1:`Questa piattaforma cartografica è un esercizio di visualizzazione ancora in corso di sviluppo (work in progress), realizzato principalmente per finalità di ricerca e per l'utilizzo in workshop di facilitazione con le persone e gli informatori selezionati dal ricercatore di dottorato Antonio del Giudice.`,
+    readme_p2:`Le informazioni geografiche e lo stato ambientale dei siti rappresentati sono raccolti da fonti terze — tra cui ARPAC, l'Arma dei Carabinieri e CampaniaGIS — e sono riportati a fini esclusivamente informativi e di ricerca.`,
+    readme_p3:`Si prega di non diffondere, pubblicare o ridistribuire questo strumento senza il consenso esplicito dell'autore/ricercatore. Per richieste relative a divulgazione, utilizzo didattico o collaborazioni, contattare:`,
     rotate_hint:'Trascina per spostare &nbsp;·&nbsp; Clic destro per ruotare &nbsp;·&nbsp; Rotella per zoom',
     sb_visible:'Siti visibili:',
     sb_hover_placeholder:'Passa il mouse su un elemento della mappa',
@@ -1468,6 +1496,10 @@ const I18N = {
     desc_spec:'Disposal and storage sites with a known perimeter.',
     search_placeholder:'Search by name, municipality, contaminant...',
     info_title:'Project info',
+    readme_title:'Read me',
+    readme_p1:`This mapping platform is a work-in-progress visualisation exercise, developed primarily for research purposes and for use in facilitation workshops with the participants and informants selected by the PhD researcher, Antonio del Giudice.`,
+    readme_p2:`The geographic information and environmental status of the sites shown are compiled from third-party sources — including ARPAC, the Carabinieri, and CampaniaGIS — and are presented for research and informational purposes only.`,
+    readme_p3:`Please do not circulate, publish, or redistribute this tool without the explicit consent of the author/researcher. For enquiries regarding dissemination, educational use, or collaboration, please contact:`,
     rotate_hint:'Drag to pan &nbsp;·&nbsp; Right-click drag to rotate &nbsp;·&nbsp; Scroll to zoom',
     sb_visible:'Visible sites:',
     sb_hover_placeholder:'Hover over a map item',
@@ -1769,6 +1801,8 @@ function switchTab(tab) {
   if (sidebar) sidebar.classList.remove('collapsed');
   const info = document.getElementById('info-panel');
   if (info) info.classList.add('collapsed');
+  const readme = document.getElementById('readme-panel');
+  if (readme) readme.classList.add('collapsed');
   tabs.forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   document.getElementById('tab-layers').style.display=tab==='layers'?'block':'none';
   const st=document.getElementById('tab-search');
@@ -1944,12 +1978,29 @@ let glMap = null;
 function toggleInfo() {
   const info = document.getElementById('info-panel');
   const sidebar = document.getElementById('sidebar');
+  const readme = document.getElementById('readme-panel');
   const opening = info.classList.contains('collapsed');
   if (opening) {
     info.classList.remove('collapsed');
     if (sidebar) sidebar.classList.add('collapsed');
+    if (readme) readme.classList.add('collapsed');
   } else {
     info.classList.add('collapsed');
+    if (sidebar) sidebar.classList.remove('collapsed');
+  }
+}
+
+function toggleReadme() {
+  const readme = document.getElementById('readme-panel');
+  const info = document.getElementById('info-panel');
+  const sidebar = document.getElementById('sidebar');
+  const opening = readme.classList.contains('collapsed');
+  if (opening) {
+    readme.classList.remove('collapsed');
+    if (sidebar) sidebar.classList.add('collapsed');
+    if (info) info.classList.add('collapsed');
+  } else {
+    readme.classList.add('collapsed');
     if (sidebar) sidebar.classList.remove('collapsed');
   }
 }
@@ -2004,8 +2055,10 @@ function printMap() {
   let restoreView = null;
   const sidebarEl = document.getElementById('sidebar');
   const infoEl = document.getElementById('info-panel');
+  const readmeEl = document.getElementById('readme-panel');
   const panelOpen = (sidebarEl && !sidebarEl.classList.contains('collapsed')) ||
-                     (infoEl && !infoEl.classList.contains('collapsed'));
+                     (infoEl && !infoEl.classList.contains('collapsed')) ||
+                     (readmeEl && !readmeEl.classList.contains('collapsed'));
   if (panelOpen && map) {
     const CROP_LEFT = 300; // sidebar/info-panel footprint: left:12px + width:280px + ~8px gutter
     const size = map.getSize();
@@ -2041,7 +2094,7 @@ function addTerrainAndData() {
       encoding: 'terrarium', tileSize: 256, maxzoom: 14
     });
   }
-  glMap.setTerrain({ source: 'terrain', exaggeration: 2.5 });
+  glMap.setTerrain({ source: 'terrain', exaggeration: 1.25 });
 
   glMap.addLayer({ id:'sky', type:'sky', paint:{
     'sky-type':'atmosphere','sky-atmosphere-sun':[0.0,60.0],
