@@ -688,8 +688,8 @@ body {
 .bm-btn:hover { color: var(--white); }
 .bm-btn.active { color: var(--white); background: var(--mid); }
 
-/* ── MOBILE LINK BUTTON ── */
-#mob-link {
+/* ── PRINT BUTTON ── */
+#print-btn {
   position: fixed;
   bottom: 10px;
   left: 10px;
@@ -706,7 +706,7 @@ body {
   cursor: pointer;
   transition: all 0.15s;
 }
-#mob-link:hover {
+#print-btn:hover {
   color: var(--white);
   border-color: var(--gray2);
 }
@@ -817,7 +817,7 @@ body {
 }
 .hdr-count { opacity: 0.85; }
 
-.btn-3d, #mob-link {
+.btn-3d, #print-btn {
   border-radius: 999px !important;
   background: rgba(255,255,255,0.10) !important;
   border: 1px solid rgba(255,255,255,0.22) !important;
@@ -833,7 +833,7 @@ body {
   text-decoration: none;
   display: inline-flex; align-items: center;
 }
-.btn-3d:hover, #mob-link:hover { background: rgba(255,255,255,0.18) !important; }
+.btn-3d:hover, #print-btn:hover { background: rgba(255,255,255,0.18) !important; }
 .btn-3d.active {
   background: rgba(236,88,173,0.55) !important;
   border-color: rgba(236,88,173,0.7) !important;
@@ -1061,7 +1061,7 @@ body.bm-maps #info-panel {
   background: rgba(200,200,200,0.14) !important;
 }
 body.bm-maps .btn-3d,
-body.bm-maps #mob-link,
+body.bm-maps #print-btn,
 body.bm-maps .hdr-logo,
 body.bm-maps #bm-ctrl,
 body.bm-maps #north-arrow,
@@ -1074,6 +1074,40 @@ body.bm-maps .maplibregl-ctrl-top-right button {
 }
 body.bm-maps .bm-btn.active {
   background: rgba(255,255,255,0.85) !important;
+}
+
+/* ── PRINT ── clean export: map + selected layers + north arrow + scale bar only.
+   #print-header is populated by printMap() right before window.print() fires. */
+#print-header { display: none; }
+@media print {
+  @page { size: landscape; margin: 8mm; }
+  /* keep body/.layout's normal 100vh flex sizing so #map-outer (position:absolute; inset:0)
+     still has a definite box to fill — do NOT switch to height:auto, it would collapse to 0 */
+  html, body { background: #fff !important; }
+
+  /* hide every piece of interactive chrome */
+  #header, #hdr-logo-btn, #sidebar, #info-panel, #statusbar,
+  .leaflet-control-zoom, #bm-ctrl, .leaflet-control-minimap,
+  .maplibregl-ctrl-top-right, #rotate-hint, #print-btn, #info-btn {
+    display: none !important;
+  }
+
+  /* keep: map, north arrow, scale bar */
+  #map-outer, #map { position: absolute !important; inset: 0 !important; }
+  #north-arrow, .leaflet-control-scale { display: block !important; }
+
+  #print-header {
+    display: block !important;
+    position: absolute; top: 10px; left: 10px; z-index: 5000;
+    background: rgba(255,255,255,0.94);
+    color: #1c1a18;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: var(--font);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  #print-header strong { display: block; font-size: 14px; font-weight: 700; }
+  #print-header .print-meta { display: block; margin-top: 2px; font-size: 10px; font-family: var(--mono); opacity: 0.75; }
 }
 
 </style>
@@ -1220,6 +1254,7 @@ body.bm-maps .bm-btn.active {
   </div><!-- /sidebar -->
 
 <div id="map-outer">
+  <div id="print-header"></div>
   <div id="map"></div>
   <div id="map3d"></div>
   <!-- Info button -->
@@ -1256,7 +1291,7 @@ body.bm-maps .bm-btn.active {
     <button class="bm-btn" id="bm-dark"  onclick="setBasemap('dark')">DARK</button>
     <button class="bm-btn" id="bm-maps"  onclick="setBasemap('maps')">MAPS</button>
   </div>
-  <a href="mobile.html" id="mob-link" title="Open mobile version">MOBILE</a>
+  <button id="print-btn" onclick="printMap()" title="Print the current map view">PRINT</button>
   <div id="north-arrow">
     <svg viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
       <circle cx="19" cy="19" r="18" fill="#1c1a18" stroke="#3a3835" stroke-width="1"/>
@@ -1884,6 +1919,25 @@ function toggle3D() {
   }
 }
 
+// ── PRINT ── clean map export: current layers + north arrow + scale bar, via the browser's native print/Save-as-PDF
+function printMap() {
+  const wasIn3D = map3dOn;
+  if (wasIn3D) toggle3D(); // print the reliable 2D map, not the WebGL 3D view
+
+  const ph = document.getElementById('print-header');
+  if (ph) {
+    const titleTxt = (document.querySelector('.hdr-title strong') || {}).textContent || '';
+    const vis = (document.getElementById('hdr-vis') || {}).textContent || '';
+    const tot = (document.getElementById('hdr-tot') || {}).textContent || '';
+    const visLabel = T('hdr_visible').replace(':', '');
+    const dateStr = new Date().toLocaleDateString(LANG === 'it' ? 'it-IT' : 'en-GB', {year:'numeric', month:'long', day:'numeric'});
+    ph.innerHTML = '<strong>' + titleTxt + '</strong><span class="print-meta">' + dateStr + ' &nbsp;·&nbsp; ' + visLabel + ' ' + vis + '/' + tot + '</span>';
+  }
+
+  const doPrint = () => { if (map && map.invalidateSize) map.invalidateSize(); window.print(); };
+  if (wasIn3D) setTimeout(doPrint, 400); else doPrint();
+}
+
 function addTerrainAndData() {
   // Add terrain DEM if not already present
   if (!glMap.getSource('terrain')) {
@@ -2140,7 +2194,7 @@ function toggleLang(){
 <script>
 (function(){
   window.addEventListener('DOMContentLoaded', function(){
-    var mob = document.getElementById('mob-link');
+    var mob = document.getElementById('print-btn');
     var btn3d = document.getElementById('btn-3d');
     if (mob && btn3d && btn3d.parentNode) {
       btn3d.parentNode.insertBefore(mob, btn3d.nextSibling);
