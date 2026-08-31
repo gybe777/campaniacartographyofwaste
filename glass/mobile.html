@@ -1115,17 +1115,21 @@ body.bm-maps #north-arrow { background: rgba(200,200,200,0.12) !important; borde
   box-shadow: none !important;
   box-sizing: border-box;
   height: auto !important;
-  line-height: normal !important;
+  line-height: 1.4 !important;
   padding: 0 6px !important;
   margin: 0 !important;
   font-family: var(--mono) !important;
   font-size: 9px !important;
   letter-spacing: 0.05em !important;
-  display: flex; align-items: center; justify-content: center;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  display: block !important;
   text-align: center;
 }
 .leaflet-control-scale-line:not(:first-child) { display: none; }
-/* End-ticks bracket the -line's true measured width, like a ruler's edges */
+/* End-ticks bracket the -line's true measured width, like a ruler's edges. Text is allowed
+   to overflow this box (never clipped, never wrapped) since Leaflet sizes -line to the true
+   ground distance, which is independent of how wide the label text needs to be. */
 .leaflet-control-scale-line::before,
 .leaflet-control-scale-line::after {
   content: '';
