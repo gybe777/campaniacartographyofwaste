@@ -745,7 +745,7 @@ body {
 
 .layout { position: relative; }
 #header {
-  position: absolute; top: 10px; left: 12px; right: 12px; z-index: 1300;
+  position: absolute; top: 10px; left: 74px; right: 12px; z-index: 1300;
   margin: 0; height: 52px;
   display: flex;
   align-items: center;
@@ -845,6 +845,18 @@ body {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.25);
   color: var(--red);
   margin-left: 2px;
+}
+
+/* WL button: floating standalone, extreme left, outside the header row */
+#hdr-logo-btn {
+  position: absolute;
+  top: 10px; left: 12px; z-index: 1301;
+  width: 52px; height: 52px;
+  margin-left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
 }
 
 /* ── SIDEBAR: floating glass card that hugs its content ── */
@@ -1028,6 +1040,7 @@ body.bm-maps .bm-btn.active {
 <body>
 
 <!-- HEADER -->
+<div class="hdr-logo" id="hdr-logo-btn" onclick="toggleInfo()" title="About this project" style="cursor:pointer;">WL</div>
 <div id="header">
   <div class="hdr-island hdr-island-tabs">
     <div class="hdr-tabs">
@@ -1044,7 +1057,6 @@ body.bm-maps .bm-btn.active {
     <div class="hdr-count"><span data-i18n="hdr_visible">Visibili:</span> <span id="hdr-vis">1250</span> / <span id="hdr-tot">1250</span></div>
     <button class="btn-3d" id="btn-lang" onclick="toggleLang()" title="Switch language">EN</button>
     <button class="btn-3d" id="btn-3d" onclick="toggle3D()" title="Toggle 3D terrain view">3D</button>
-    <div class="hdr-logo" id="hdr-logo-btn" onclick="toggleInfo()" title="About this project" style="cursor:pointer;">WL</div>
   </div>
 </div>
 
