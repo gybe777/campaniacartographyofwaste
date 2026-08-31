@@ -881,9 +881,9 @@ body {
   border-right-width: 1px !important;
 }
 
-/* ── INFO PANEL: same floating glass card treatment, drops under WL ── */
+/* ── INFO PANEL: same floating glass card + slide effect as the layers/search sidebar, same left slot ── */
 #info-panel {
-  position: absolute; top: 74px; right: 12px; left: auto; width: 280px;
+  position: absolute; top: 74px; left: 12px; right: auto; width: 280px;
   height: auto;
   max-height: calc(100vh - 74px - 74px);
   z-index: 1200;
@@ -895,8 +895,16 @@ body {
   box-shadow: 0 10px 34px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.14);
   overflow-x: hidden;
   overflow-y: auto;
+  display: flex;
+  transition: width 0.22s ease, opacity 0.18s ease, border-color 0.22s ease;
 }
-#info-panel.open { display: flex; }
+#info-panel.collapsed {
+  width: 280px !important;
+  opacity: 0 !important;
+  transform: translateX(-16px);
+  border-right-width: 1px !important;
+  pointer-events: none;
+}
 .info-hdr { border-bottom: 1px solid rgba(255,255,255,0.14); border-radius: 22px 22px 0 0; }
 
 /* ── FOOTER / STATUS BAR ── */
@@ -1183,7 +1191,7 @@ body.bm-maps .bm-btn.active {
   <div id="map3d"></div>
   <!-- Info button -->
   <div id="info-btn" onclick="toggleInfo()" data-i18n-title="info_title" title="Info sul progetto">i</div>
-  <div id="info-panel">
+  <div id="info-panel" class="collapsed">
     <div class="info-hdr">
       <button class="info-close" onclick="toggleInfo()">×</button>
     </div>
@@ -1616,6 +1624,8 @@ function switchTab(tab) {
   }
 
   if (sidebar) sidebar.classList.remove('collapsed');
+  const info = document.getElementById('info-panel');
+  if (info) info.classList.add('collapsed');
   tabs.forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   document.getElementById('tab-layers').style.display=tab==='layers'?'block':'none';
   const st=document.getElementById('tab-search');
@@ -1789,7 +1799,16 @@ let map3dOn = false;
 let glMap = null;
 
 function toggleInfo() {
-  document.getElementById('info-panel').classList.toggle('open');
+  const info = document.getElementById('info-panel');
+  const sidebar = document.getElementById('sidebar');
+  const opening = info.classList.contains('collapsed');
+  if (opening) {
+    info.classList.remove('collapsed');
+    if (sidebar) sidebar.classList.add('collapsed');
+  } else {
+    info.classList.add('collapsed');
+    if (sidebar) sidebar.classList.remove('collapsed');
+  }
 }
 
 function toggle3D() {
