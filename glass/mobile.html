@@ -1069,7 +1069,7 @@ body.bm-maps .bm-btn.active { background: rgba(255,255,255,0.85) !important; }
   </div>
   <div class="hdr-title"></div>
   <div class="hdr-right">
-    <div class="hdr-count"><span data-i18n="hdr_visible">Visibili:</span> <span id="hdr-vis">241</span> / <span id="hdr-tot">241</span></div>
+    <div class="hdr-count"><span data-i18n="hdr_visible">Visibili:</span> <span id="hdr-vis">1250</span> / <span id="hdr-tot">1250</span></div>
     <button class="btn-3d" id="btn-lang" onclick="toggleLang()" title="Switch language" style="margin-right:4px">EN</button>
     <a href="index.html" class="btn-3d" id="mob-link" title="Open desktop version" style="margin-right:4px; text-decoration:none; -webkit-appearance:none; touch-action:manipulation;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><rect x="1" y="2" width="18" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 17h6M10 14v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
     <button class="btn-3d" id="btn-3d" onclick="toggle3D()" title="Toggle 3D terrain view">3D</button>
@@ -1675,6 +1675,19 @@ function toggleLayerVisibility(id) {
     const vis = newState ? 'visible' : 'none';
     (GL_LAYER_IDS[id]||[]).forEach(lid=>{ if(glMap.getLayer(lid)) glMap.setLayoutProperty(lid,'visibility',vis); });
   }
+  updateHeaderCounts();
+}
+
+// ── HEADER "VISIBILI" COUNT — across ALL layers, not just contaminated sites ──
+function updateHeaderCounts() {
+  const totalAll = SITES.length + SVERSAMENTI.length + BENI.length + PARTICELLE.length + COMUNI.length;
+  const visAll = filtIdx.size
+    + (sverOn   ? SVERSAMENTI.length : 0)
+    + (beniOn   ? BENI.length       : 0)
+    + (partOn   ? PARTICELLE.length : 0)
+    + (comuniOn ? COMUNI.length     : 0);
+  document.getElementById('hdr-vis').textContent = visAll;
+  document.getElementById('hdr-tot').textContent = totalAll;
 }
 
 // ── TAB SWITCHING ──
@@ -1705,8 +1718,8 @@ function applyFilters() {
     vis?(filtIdx.add(i),cnt++,markersLg.hasLayer(m)||m.addTo(markersLg))
        :(filtIdx.delete(i),markersLg.hasLayer(m)&&markersLg.removeLayer(m));
   });
-  document.getElementById('hdr-vis').textContent=cnt;
   document.getElementById('sb-vis').textContent=cnt;
+  updateHeaderCounts();
   if (glMap && glMap.getSource('sites3d')) glMap.getSource('sites3d').setData(sitesFilteredFC());
   renderList();
 }
@@ -1798,6 +1811,7 @@ function resetAll() {
 
 // ── INIT ──
 renderList();
+updateHeaderCounts();
 map.fitBounds(SITES.map(s=>[s.lat,s.lon]),{padding:[40,40]});
 
 // ── BASEMAP SWITCHER ──

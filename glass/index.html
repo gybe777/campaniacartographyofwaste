@@ -747,18 +747,35 @@ body {
 #header {
   position: absolute; top: 10px; left: 12px; right: 12px; z-index: 1300;
   margin: 0; height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+  overflow: visible;
+}
+#header::after { display: none; }
+#map-outer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; flex: none; }
+
+/* Three separate floating glass islands: layers/search · title · actions */
+.hdr-island {
+  height: 52px;
   border-radius: 26px;
   background: rgba(255,255,255,0.07);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   border: 1px solid rgba(255,255,255,0.16);
   box-shadow: 0 8px 28px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.22);
-  overflow: visible;
   display: flex;
   align-items: center;
 }
-#header::after { display: none; }
-#map-outer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; flex: none; }
+.hdr-island-tabs { flex-shrink: 0; padding: 6px; }
+.hdr-island-title { flex: 1; min-width: 0; padding: 0 24px; justify-content: center; }
+.hdr-island-actions { flex-shrink: 0; gap: 8px; padding: 0 10px 0 16px; }
 
 .hdr-tabs {
   display: flex;
@@ -767,7 +784,6 @@ body {
   background: rgba(0,0,0,0.16);
   border-radius: 999px;
   padding: 4px;
-  margin: 0 6px 0 10px;
   gap: 2px;
   backdrop-filter: blur(10px);
 }
@@ -787,8 +803,13 @@ body {
   border-bottom: none !important;
   box-shadow: 0 2px 10px rgba(0,0,0,0.28);
 }
-.hdr-title { border-left: none !important; opacity: 0.92; }
-.hdr-right { border-left: none !important; gap: 8px; padding-right: 10px; align-items: center; }
+.hdr-title {
+  border-left: none !important;
+  opacity: 0.92;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .hdr-count { opacity: 0.85; }
 
 .btn-3d, #mob-link {
@@ -1008,17 +1029,22 @@ body.bm-maps .bm-btn.active {
 
 <!-- HEADER -->
 <div id="header">
-  <div class="hdr-tabs">
-    <div class="hdr-tab active" data-tab="layers" onclick="switchTab('layers')" data-i18n="tab_layers">Layers</div>
-    <div class="hdr-tab" data-tab="search" onclick="switchTab('search')" data-i18n="tab_search">Cerca</div>
+  <div class="hdr-island hdr-island-tabs">
+    <div class="hdr-tabs">
+      <div class="hdr-tab active" data-tab="layers" onclick="switchTab('layers')" data-i18n="tab_layers">Layers</div>
+      <div class="hdr-tab" data-tab="search" onclick="switchTab('search')" data-i18n="tab_search">Cerca</div>
+    </div>
   </div>
-  <div class="hdr-title">
-    <strong>Wasting the Land</strong> <span id="hdr-subtitle" data-i18n="hdr_subtitle">Mapping of Campania Wasted Ecologies</span>
+  <div class="hdr-island hdr-island-title">
+    <div class="hdr-title">
+      <strong>Wasting the Land</strong> <span id="hdr-subtitle" data-i18n="hdr_subtitle">Mapping of Campania Wasted Ecologies</span>
+    </div>
   </div>
-  <div class="hdr-right">
-    <div class="hdr-count"><span data-i18n="hdr_visible">Visibili:</span> <span id="hdr-vis">241</span> / <span id="hdr-tot">241</span></div>
-    <button class="btn-3d" id="btn-lang" onclick="toggleLang()" title="Switch language" style="margin-right:4px">EN</button>
-    <button class="btn-3d" id="btn-3d" onclick="toggle3D()" title="Toggle 3D terrain view">3D</button><div class="hdr-logo" id="hdr-logo-btn" onclick="toggleInfo()" title="About this project" style="cursor:pointer;">WL</div>
+  <div class="hdr-island hdr-island-actions">
+    <div class="hdr-count"><span data-i18n="hdr_visible">Visibili:</span> <span id="hdr-vis">1250</span> / <span id="hdr-tot">1250</span></div>
+    <button class="btn-3d" id="btn-lang" onclick="toggleLang()" title="Switch language">EN</button>
+    <button class="btn-3d" id="btn-3d" onclick="toggle3D()" title="Toggle 3D terrain view">3D</button>
+    <div class="hdr-logo" id="hdr-logo-btn" onclick="toggleInfo()" title="About this project" style="cursor:pointer;">WL</div>
   </div>
 </div>
 
@@ -1548,6 +1574,19 @@ function toggleLayerVisibility(id) {
     const vis = newState ? 'visible' : 'none';
     (GL_LAYER_IDS[id]||[]).forEach(lid=>{ if(glMap.getLayer(lid)) glMap.setLayoutProperty(lid,'visibility',vis); });
   }
+  updateHeaderCounts();
+}
+
+// ── HEADER "VISIBILI" COUNT — across ALL layers, not just contaminated sites ──
+function updateHeaderCounts() {
+  const totalAll = SITES.length + SVERSAMENTI.length + BENI.length + PARTICELLE.length + COMUNI.length;
+  const visAll = filtIdx.size
+    + (sverOn   ? SVERSAMENTI.length : 0)
+    + (beniOn   ? BENI.length       : 0)
+    + (partOn   ? PARTICELLE.length : 0)
+    + (comuniOn ? COMUNI.length     : 0);
+  document.getElementById('hdr-vis').textContent = visAll;
+  document.getElementById('hdr-tot').textContent = totalAll;
 }
 
 // ── TAB SWITCHING ──
@@ -1594,8 +1633,8 @@ function applyFilters() {
     vis?(filtIdx.add(i),cnt++,markersLg.hasLayer(m)||m.addTo(markersLg))
        :(filtIdx.delete(i),markersLg.hasLayer(m)&&markersLg.removeLayer(m));
   });
-  document.getElementById('hdr-vis').textContent=cnt;
   document.getElementById('sb-vis').textContent=cnt;
+  updateHeaderCounts();
   if (glMap && glMap.getSource('sites3d')) glMap.getSource('sites3d').setData(sitesFilteredFC());
   renderList();
 }
@@ -1685,6 +1724,7 @@ function resetAll() {
 
 // ── INIT ──
 renderList();
+updateHeaderCounts();
 map.fitBounds(SITES.map(s=>[s.lat,s.lon]),{padding:[40,40]});
 
 // ── BASEMAP SWITCHER ──
