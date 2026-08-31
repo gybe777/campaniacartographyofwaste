@@ -1082,41 +1082,31 @@ body.bm-maps #north-arrow { background: rgba(200,200,200,0.12) !important; borde
 }
 .leaflet-control-minimap .leaflet-control-minimap-toggle-display { display: none !important; }
 
-/* Scale sits to the right of the minimap, vertically centered on it, styled as a compact
-   graduated ruler, not a bare number. The glass/blur backing lives on a ::before PSEUDO-
-   ELEMENT of the outer container — a sibling in the stacking order, never an ancestor of
-   the text. Chromium/Safari can ghost text that merely sits *inside* a blurred ancestor's
-   subtree (even when that ancestor itself has no text), so the blur surface must not
-   contain the text node at all; stacking it behind via z-index avoids that bug entirely. */
+/* Centered along the bottom of the SCREEN (not next to the minimap), styled as a compact
+   graduated ruler, not a bare number. No backdrop-filter anywhere on or behind this control:
+   Chromium/Safari can fail to repaint a blurred layer cleanly the moment the custom webfont
+   finishes loading and swaps in, leaving the pre-swap fallback-font glyphs ghosted underneath
+   the new ones — a solid (non-blurred) background sidesteps that whole bug class rather than
+   chasing it case by case. */
 .leaflet-control-scale {
-  margin: 0 !important; position: absolute !important; bottom: 94px !important; left: 147px !important;
-  background: transparent !important;
+  margin: 0 !important; position: absolute !important;
+  left: 50vw !important; bottom: 60px !important;
+  transform: translateX(-50%) !important;
+  background: rgba(28,26,24,0.72) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  border: none !important;
-  box-shadow: none !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3) !important;
   box-sizing: border-box;
   height: 28px !important;
   padding: 0 10px !important;
   display: flex !important; align-items: center; justify-content: center;
-  isolation: isolate;
-}
-.leaflet-control-scale::before {
-  content: '';
-  position: absolute; inset: 0;
-  z-index: 0;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(16px) saturate(170%);
-  -webkit-backdrop-filter: blur(16px) saturate(170%);
-  border: 1px solid rgba(255,255,255,0.22);
-  border-radius: 8px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.25);
 }
 /* -line keeps Leaflet's own inline width (the true measured ground distance in px) — ticks
    bracket THAT box so they mark the real scale, and text is centered inside it. */
 .leaflet-control-scale-line {
   position: relative;
-  z-index: 1;
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -1128,7 +1118,9 @@ body.bm-maps #north-arrow { background: rgba(200,200,200,0.12) !important; borde
   line-height: normal !important;
   padding: 0 6px !important;
   margin: 0 !important;
+  font-family: var(--mono) !important;
   font-size: 9px !important;
+  letter-spacing: 0.05em !important;
   display: flex; align-items: center; justify-content: center;
   text-align: center;
 }
@@ -1142,11 +1134,10 @@ body.bm-maps #north-arrow { background: rgba(200,200,200,0.12) !important; borde
   width: 2px;
   background: rgba(255,255,255,0.85);
   border-radius: 1px;
-  z-index: 1;
 }
 .leaflet-control-scale-line::before { left: 0; }
 .leaflet-control-scale-line::after { right: 0; }
-body.bm-maps .leaflet-control-scale::before { background: rgba(200,200,200,0.12) !important; border-color: rgba(200,200,200,0.26) !important; }
+body.bm-maps .leaflet-control-scale { background: rgba(60,58,56,0.72) !important; border-color: rgba(200,200,200,0.26) !important; }
 
 </style>
 </head>
