@@ -966,7 +966,6 @@ body {
    .leaflet-control-scale container, never on the text-bearing -line element itself — text
    rendered directly on a backdrop-filter layer shows a faint ghosted double in Chromium. */
 .leaflet-control-scale {
-  position: relative;
   margin: 0 !important; position: absolute !important; bottom: 102px !important; left: 172px !important;
   background: rgba(255,255,255,0.12) !important;
   backdrop-filter: blur(16px) saturate(170%);
@@ -975,12 +974,16 @@ body {
   border-radius: 8px !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.25) !important;
   box-sizing: border-box;
-  min-width: 60px;
   height: 34px !important;
   padding: 0 14px !important;
   display: flex !important; align-items: center; justify-content: center;
 }
+/* -line keeps Leaflet's own inline width (the true measured ground distance in px) — ticks
+   bracket THAT box so they mark the real scale, and text is centered inside it. The blurred
+   glass chrome stays on the outer container above; -line itself is never blurred, since text
+   rendered directly on a backdrop-filter layer shows a faint ghosted double in Chromium. */
 .leaflet-control-scale-line {
+  position: relative;
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -990,21 +993,23 @@ body {
   box-sizing: border-box;
   height: auto !important;
   line-height: normal !important;
-  padding: 0 !important;
+  padding: 0 8px !important;
   margin: 0 !important;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
 }
-/* End-ticks: on the outer (unblurred-text) container, spanning its height like a ruler's edges */
-.leaflet-control-scale::before,
-.leaflet-control-scale::after {
+/* End-ticks bracket the -line's true measured width, like a ruler's edges */
+.leaflet-control-scale-line::before,
+.leaflet-control-scale-line::after {
   content: '';
   position: absolute;
-  top: 5px; bottom: 5px;
+  top: -3px; bottom: -3px;
   width: 2px;
   background: rgba(255,255,255,0.85);
   border-radius: 1px;
 }
-.leaflet-control-scale::before { left: 3px; }
-.leaflet-control-scale::after { right: 3px; }
+.leaflet-control-scale-line::before { left: 0; }
+.leaflet-control-scale-line::after { right: 0; }
 
 /* ── MINIMAP: bottom-left locator, FA "Cartography of Genocide"-style compact glass box ── */
 .leaflet-control-minimap {
@@ -1151,10 +1156,10 @@ body.bm-maps .bm-btn.active {
     height: auto !important;
     line-height: normal !important;
   }
-  .leaflet-control-scale::before,
-  .leaflet-control-scale::after {
+  .leaflet-control-scale-line::before,
+  .leaflet-control-scale-line::after {
     background: #fff !important;
-    top: 2px; bottom: 2px;
+    top: -2px; bottom: -2px;
   }
 }
 
