@@ -657,6 +657,10 @@ body {
   font-family: var(--font); font-size: 15px; color: var(--gray1);
   line-height: 1.6;
 }
+.info-title-wl {
+  font-family: var(--font); font-size: 15px; font-weight: 700;
+  color: var(--white); line-height: 1.4; margin-bottom: 6px;
+}
 /* ── 3D ROTATE HINT ── */
 #rotate-hint {
   position: absolute; bottom: 10px; left: 50%;
@@ -1191,6 +1195,11 @@ body.bm-maps .leaflet-control-scale { background: rgba(60,58,56,0.72) !important
     <div class="info-body">
 
       <div class="info-section">
+        <div class="info-title-wl" data-i18n="wl_title">Wasting the Land</div>
+        <div class="info-text" data-i18n="wl_subtitle">Commoning, movimenti dal basso e la lotta contro le relazioni di scarto in Campania, Italia.</div>
+      </div>
+
+      <div class="info-section">
         <div class="info-text" data-i18n="info_p1">Questa ricerca esamina la prolungata e complessa crisi dei rifiuti in Italia e l'emarginazione delle comunità maggiormente colpite da essa, condizioni che hanno dato origine a movimenti dal basso che si battono per la giustizia ambientale. Il progetto si propone di co-produrre metodi rappresentativi alternativi per i processi di messa in comune (commoning) (Federici, 2019) e nuove strategie territoriali, lavorando a stretto contatto con i movimenti ambientalisti dal basso e le pratiche agroecologiche situate in Campania. Attraverso queste collaborazioni, mira a sviluppare una contronarrazione rispetto alla trascuratezza da parte dello Stato e delle imprese, radicata nell'azione collettiva e in un profondo legame con la terra. In tal modo, dimostra come le risposte guidate dalle comunità possano offrire alternative più sostenibili ed eque alle politiche ambientali calate dall'alto.</div>
       </div>
 
@@ -1403,7 +1412,6 @@ body.bm-maps .leaflet-control-scale { background: rgba(60,58,56,0.72) !important
     <span id="sb-hover-title" data-i18n="sb_hover_placeholder">Tap a map item</span>
     <span id="sb-hover-comune"></span>
   </div>
-  <div class="sb-item"><span data-i18n="sb_visible">Siti visibili:</span> <span id="sb-vis">241</span></div>
   <div class="sb-item" id="sb-attrib">🇵🇸 Leaflet · © Esri</div>
 </div>
 
@@ -1450,6 +1458,8 @@ const I18N = {
     hdr_subtitle:'Una cartografia delle relazioni di scarto della Campania',
     hdr_visible:'Visibili:',
     sidebar_meta:'I layer possono essere combinati per visualizzare pattern territoriali.',
+    wl_title:'Wasting the Land',
+    wl_subtitle:'Commoning, movimenti dal basso e la lotta contro le relazioni di scarto in Campania, Italia.',
     info_p1:`Questa ricerca esamina la prolungata e complessa crisi dei rifiuti in Italia e l'emarginazione delle comunità maggiormente colpite da essa, condizioni che hanno dato origine a movimenti dal basso che si battono per la giustizia ambientale. Il progetto si propone di co-produrre metodi rappresentativi alternativi per i processi di messa in comune (commoning) (Federici, 2019) e nuove strategie territoriali, lavorando a stretto contatto con i movimenti ambientalisti dal basso e le pratiche agroecologiche situate in Campania. Attraverso queste collaborazioni, mira a sviluppare una contronarrazione rispetto alla trascuratezza da parte dello Stato e delle imprese, radicata nell'azione collettiva e in un profondo legame con la terra. In tal modo, dimostra come le risposte guidate dalle comunità possano offrire alternative più sostenibili ed eque alle politiche ambientali calate dall'alto.`,
     info_p2:`Il progetto adotta una metodologia di ricerca "embedded" (integrata sul campo) per indagare le forze sociali che sfidano attivamente ciò che gli studiosi hanno definito "relazioni di scarto" (Armiero e Sgueglia, 2019). L'indagine parte da uno studio approfondito della Terra dei Fuochi, in Campania (Alberti, 2022), un'area gravemente colpita da decenni di smaltimento illegale di rifiuti facilitato dalla criminalità organizzata e dalla corruzione politica. In collaborazione con organizzazioni tra cui Libera Terra e il Forum Civico per la Rigenerazione Territoriale, la ricerca co-sviluppa strumenti e metodi per mappare come le pratiche di messa in comune della terra abbiano recuperato e rigenerato i paesaggi contaminati, promuovendo al contempo strategie territoriali alternative, policymaking e strumenti legali per riproporre diversi modelli di uso del suolo.`,
     info_p3:`Attingendo alle teorie del commoning (Federici; De Angelis, 2014; Stavrides, 2016) e della pratica spaziale critica (Kunstler, 2022), informate dai movimenti campani di ritorno alla terra, il progetto sostiene che la crisi ecologica non possa essere affrontata senza confrontarsi con le condizioni spaziali e le politiche urbanistiche che riproducono la disuguaglianza attraverso la creazione di "relazioni di scarto" (Armiero, 2021). Anziché considerare il degrado ambientale principalmente come un problema tecnologico, il progetto lo inquadra come una conseguenza dell'ingiustizia politica, spaziale e sociale — una prospettiva fondamentale per immaginare futuri rigenerativi e più equi.`,
@@ -1474,7 +1484,6 @@ const I18N = {
     readme_p2:`Le informazioni geografiche e lo stato ambientale dei siti rappresentati sono raccolti da fonti terze — tra cui ARPAC, l'Arma dei Carabinieri e CampaniaGIS — e sono riportati a fini esclusivamente informativi e di ricerca.`,
     readme_p3:`Si prega di non diffondere, pubblicare o ridistribuire questo strumento senza il consenso esplicito dell'autore. Per richieste relative a divulgazione, utilizzo didattico o collaborazioni, contattare:`,
     rotate_hint:'Trascina per spostare &nbsp;·&nbsp; Clic destro per ruotare &nbsp;·&nbsp; Rotella per zoom',
-    sb_visible:'Siti visibili:',
     sb_hover_placeholder:'Tocca un elemento della mappa',
     section_abstract:'Abstract', section_bio:'Bio',
     p_comune:'Comune', p_tipo:'Tipo', p_codice:'Codice',
@@ -1501,6 +1510,8 @@ const I18N = {
     hdr_subtitle:"A Cartography of Campania's Wasting Relationships",
     hdr_visible:'Visible:',
     sidebar_meta:'Layers can be combined to visualise territorial patterns.',
+    wl_title:'Wasting the Land',
+    wl_subtitle:'Commoning, grassroots movements, and the struggle against wasting relationships in the Campania region, Italy.',
     info_p1:`This research examines Italy’s prolonged and complex waste crisis and the marginalisation of the communities most affected by it, conditions that have given rise to grassroots movements advocating for environmental justice. The project seeks to co-produce alternative representational methods for commoning processes (Federici, 2019) and new territorial strategies by working closely with environmental grassroots movements and situated agroecological practices in Campania. Through these collaborations, it aims to develop a counter-narrative to state and corporate neglect, one that is rooted in collective action and a profound connection to the land. In doing so, it demonstrates how community-led responses can offer more sustainable and equitable alternatives to top-down environmental policies.`,
     info_p2:`The project adopts an embedded research methodology to investigate the social forces actively challenging what scholars have described as “wasting relationships” (Armiero and Sgueglia, 2019). The investigation begins with an in-depth study of the Land of Fires (Terra dei Fuochi) in the Campania region (Alberti, 2022), an area severely affected by decades of illegal waste dumping facilitated by organised crime and political corruption. In collaboration with organisations including Libera Terra and the Territorial Regeneration Civic Forum, the research co-develops tools and methods to map how practices of land commoning have reclaimed and regenerated contaminated landscapes while advancing alternative strategies for land use.`,
     info_p3:`Drawing on theories of commoning (Federici; De Angelis, 2014; Stavrides, 2016) and critical spatial practice (Kunstler, 2022), informed by Campania’s back-to-the-land movements, the project argues that the ecological crisis cannot be addressed without confronting the spatial conditions and planning policies that reproduce inequality through the creation of “wasting relationships” (Armiero, 2021). Rather than treating environmental degradation as a primarily technological problem, it frames the crisis as a consequence of political, spatial, and social injustice—a perspective that is fundamental to imagining regenerative and more equitable futures.`,
@@ -1525,7 +1536,6 @@ const I18N = {
     readme_p2:`The geographic information and environmental status of the sites shown are compiled from third-party sources — including ARPAC, the Carabinieri, and CampaniaGIS — and are presented for research and informational purposes only.`,
     readme_p3:`Please do not circulate, publish, or redistribute this tool without the explicit consent of the author. For enquiries regarding dissemination, educational use, or collaboration, please contact:`,
     rotate_hint:'Drag to pan &nbsp;·&nbsp; Right-click drag to rotate &nbsp;·&nbsp; Scroll to zoom',
-    sb_visible:'Visible sites:',
     sb_hover_placeholder:'Tap a map item',
     section_abstract:'Abstract', section_bio:'Bio',
     p_comune:'Municipality', p_tipo:'Type', p_codice:'Code',
@@ -1883,7 +1893,6 @@ function applyFilters() {
     vis?(filtIdx.add(i),cnt++,markersLg.hasLayer(m)||m.addTo(markersLg))
        :(filtIdx.delete(i),markersLg.hasLayer(m)&&markersLg.removeLayer(m));
   });
-  document.getElementById('sb-vis').textContent=cnt;
   updateHeaderCounts();
   if (glMap && glMap.getSource('sites3d')) glMap.getSource('sites3d').setData(sitesFilteredFC());
   renderList();
