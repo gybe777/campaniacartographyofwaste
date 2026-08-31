@@ -13,6 +13,8 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <link href='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css' rel='stylesheet'/>
 <script src='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js'></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.js"></script>
 <style>
 :root {
   --black:   #1c1a18;
@@ -863,7 +865,7 @@ body {
 #sidebar {
   position: absolute; top: 74px; left: 12px; width: 280px;
   height: auto;
-  max-height: calc(100vh - 74px - 74px);
+  max-height: calc(100vh - 74px - 190px);
   z-index: 1200;
   background: rgba(30,28,26,0.45);
   backdrop-filter: blur(26px) saturate(170%);
@@ -885,7 +887,7 @@ body {
 #info-panel {
   position: absolute; top: 74px; left: 12px; right: auto; width: 280px;
   height: auto;
-  max-height: calc(100vh - 74px - 74px);
+  max-height: calc(100vh - 74px - 190px);
   z-index: 1200;
   background: rgba(30,28,26,0.45);
   backdrop-filter: blur(26px) saturate(170%);
@@ -956,22 +958,49 @@ body {
 .bm-btn { border-right: none !important; border-radius: 999px; color: rgba(255,255,255,0.75); min-height: 28px; }
 .bm-btn.active { background: rgba(255,255,255,0.92) !important; color: #1c1a18 !important; }
 
-.leaflet-control-scale { margin: 0 !important; position: absolute !important; bottom: 64px !important; left: 12px !important; }
+/* Scale sits to the right of the minimap, styled as an actual graduated ruler (end-ticks), not a bare number */
+.leaflet-control-scale { margin: 0 !important; position: absolute !important; bottom: 64px !important; left: 172px !important; }
 .leaflet-control-scale-line {
+  position: relative;
   background: rgba(255,255,255,0.12) !important;
   backdrop-filter: blur(16px) saturate(170%);
   -webkit-backdrop-filter: blur(16px) saturate(170%);
   border: 1px solid rgba(255,255,255,0.22) !important;
   border-top: 1px solid rgba(255,255,255,0.22) !important;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
   color: var(--white) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.25);
   box-sizing: border-box;
+  min-width: 60px;
   height: 34px !important;
   line-height: 32px !important;
   padding: 0 14px !important;
-  display: flex; align-items: center;
+  display: flex; align-items: center; justify-content: center;
 }
+/* End-ticks: the box width == the real ground distance in px, so these mark the measured span like a ruler */
+.leaflet-control-scale-line::before,
+.leaflet-control-scale-line::after {
+  content: '';
+  position: absolute;
+  top: 5px; bottom: 5px;
+  width: 2px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 1px;
+}
+.leaflet-control-scale-line::before { left: 3px; }
+.leaflet-control-scale-line::after { right: 3px; }
+
+/* ── MINIMAP: bottom-left locator, FA "Cartography of Genocide"-style compact glass box ── */
+.leaflet-control-minimap {
+  position: absolute !important;
+  bottom: 64px !important; left: 12px !important;
+  margin: 0 !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.3) !important;
+  overflow: hidden;
+}
+.leaflet-control-minimap .leaflet-control-minimap-toggle-display { display: none !important; }
 
 .leaflet-control-zoom {
   position: fixed !important;
@@ -1034,6 +1063,7 @@ body.bm-maps .hdr-logo,
 body.bm-maps #bm-ctrl,
 body.bm-maps #north-arrow,
 body.bm-maps .leaflet-control-scale-line,
+body.bm-maps .leaflet-control-minimap,
 body.bm-maps .leaflet-control-zoom a,
 body.bm-maps .maplibregl-ctrl-top-right button {
   background: rgba(200,200,200,0.10) !important;
@@ -1377,6 +1407,20 @@ const cartoDark  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/serv
 
 satellite.addTo(map);
 L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);
+
+// ── MINIMAP (bottom-left locator) ──
+try {
+  const miniTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'',maxZoom:19,maxNativeZoom:16});
+  new L.Control.MiniMap(miniTile,{
+    position:'bottomleft',
+    width:150, height:110,
+    zoomLevelOffset:-5,
+    toggleDisplay:false,
+    minimized:false,
+    aimingRectOptions:{color:'#EE4238',weight:2,opacity:0.9,fillOpacity:0.05},
+    shadowRectOptions:{color:'#1c1a18',weight:1,opacity:0.5,fillOpacity:0.1}
+  }).addTo(map);
+} catch(e) { console.warn('MiniMap unavailable:', e); }
 
 // ── FOOTER HOVER INFO ──
 const SB_ICONS = {
