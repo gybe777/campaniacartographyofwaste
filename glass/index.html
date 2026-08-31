@@ -1095,15 +1095,14 @@ body.bm-maps .bm-btn.active {
   }
 
   /* keep: map, plus a minimal print-only north arrow + scale bar, both bottom-left.
-     Crop to only the area right of the layer tab (#sidebar, 280px wide, left:12px,
-     right edge ~292px) — clip-path only affects paint, never Leaflet's internal size
-     measurements, so no invalidateSize() timing issue like a left/width change would cause. */
+     When the layer tab / info panel is open, printMap() re-centers the Leaflet view
+     (fitBounds) onto exactly the area still visible to its right, so that slice fills
+     the whole page here — #map-outer itself is never resized or offset for print. */
   #map-outer, #map { position: absolute !important; inset: 0 !important; }
-  #map-outer { clip-path: inset(0 0 0 300px) !important; }
 
   #print-header {
     display: block !important;
-    position: absolute; top: 8px; left: 308px; z-index: 5000;
+    position: absolute; top: 8px; left: 8px; z-index: 5000;
     background: rgba(255,255,255,0.9);
     color: #1c1a18;
     padding: 3px 8px;
@@ -1119,12 +1118,12 @@ body.bm-maps .bm-btn.active {
 
   #print-north-arrow {
     display: block !important;
-    position: absolute; bottom: 14px; left: 314px; z-index: 5000;
+    position: absolute; bottom: 14px; left: 14px; z-index: 5000;
     width: 22px; height: 22px;
   }
 
   .leaflet-control-scale {
-    bottom: 16px !important; left: 346px !important;
+    bottom: 16px !important; left: 46px !important;
   }
   .leaflet-control-scale-line {
     background: none !important;
@@ -1978,7 +1977,40 @@ function printMap() {
     ph.innerHTML = '<strong>' + titleTxt + '</strong><span class="print-meta">' + dateStr + ' &nbsp;·&nbsp; ' + visLabel + ' ' + vis + '/' + tot + '</span>';
   }
 
-  const doPrint = () => { if (map && map.invalidateSize) map.invalidateSize(); window.print(); };
+  // If the layer tab (sidebar) or the WL info panel is open, it covers the left ~300px
+  // of the screen — re-center/zoom the existing Leaflet view (fitBounds) onto exactly the
+  // geographic area still visible to its right, so that slice fills the whole printed page
+  // instead of leaving the panel's footprint blank. This changes what the map is looking
+  // at, not #map-outer's size, so there's no invalidateSize() timing concern; the view is
+  // restored once printing finishes so the on-screen map is unaffected.
+  let restoreView = null;
+  const sidebarEl = document.getElementById('sidebar');
+  const infoEl = document.getElementById('info-panel');
+  const panelOpen = (sidebarEl && !sidebarEl.classList.contains('collapsed')) ||
+                     (infoEl && !infoEl.classList.contains('collapsed'));
+  if (panelOpen && map) {
+    const CROP_LEFT = 300; // sidebar/info-panel footprint: left:12px + width:280px + ~8px gutter
+    const size = map.getSize();
+    if (size.x > CROP_LEFT + 40) { // only worth cropping if meaningful map remains beyond it
+      const prevCenter = map.getCenter();
+      const prevZoom = map.getZoom();
+      const nw = map.containerPointToLatLng([CROP_LEFT, 0]);
+      const se = map.containerPointToLatLng([size.x, size.y]);
+      map.fitBounds(L.latLngBounds(nw, se), { animate: false });
+      restoreView = () => map.setView(prevCenter, prevZoom, { animate: false });
+    }
+  }
+
+  const doPrint = () => {
+    if (map && map.invalidateSize) map.invalidateSize();
+    if (restoreView) {
+      window.addEventListener('afterprint', function onAfterPrint() {
+        window.removeEventListener('afterprint', onAfterPrint);
+        restoreView();
+      });
+    }
+    window.print();
+  };
   if (wasIn3D) setTimeout(doPrint, 400); else doPrint();
 }
 
