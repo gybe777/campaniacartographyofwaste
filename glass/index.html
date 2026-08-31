@@ -1079,35 +1079,71 @@ body.bm-maps .bm-btn.active {
 /* ── PRINT ── clean export: map + selected layers + north arrow + scale bar only.
    #print-header is populated by printMap() right before window.print() fires. */
 #print-header { display: none; }
+#print-north-arrow { display: none; }
 @media print {
   @page { size: landscape; margin: 8mm; }
   /* keep body/.layout's normal 100vh flex sizing so #map-outer (position:absolute; inset:0)
      still has a definite box to fill — do NOT switch to height:auto, it would collapse to 0 */
   html, body { background: #fff !important; }
 
-  /* hide every piece of interactive chrome */
+  /* hide every piece of interactive chrome, including the decorative on-screen north arrow */
   #header, #hdr-logo-btn, #sidebar, #info-panel, #statusbar,
   .leaflet-control-zoom, #bm-ctrl, .leaflet-control-minimap,
-  .maplibregl-ctrl-top-right, #rotate-hint, #print-btn, #info-btn {
+  .maplibregl-ctrl-top-right, #rotate-hint, #print-btn, #info-btn,
+  #north-arrow {
     display: none !important;
   }
 
-  /* keep: map, north arrow, scale bar */
+  /* keep: map, plus a minimal print-only north arrow + scale bar, both bottom-left.
+     Crop to only the area right of the layer tab (#sidebar, 280px wide, left:12px,
+     right edge ~292px) — clip-path only affects paint, never Leaflet's internal size
+     measurements, so no invalidateSize() timing issue like a left/width change would cause. */
   #map-outer, #map { position: absolute !important; inset: 0 !important; }
-  #north-arrow, .leaflet-control-scale { display: block !important; }
+  #map-outer { clip-path: inset(0 0 0 300px) !important; }
 
   #print-header {
     display: block !important;
-    position: absolute; top: 10px; left: 10px; z-index: 5000;
-    background: rgba(255,255,255,0.94);
+    position: absolute; top: 8px; left: 308px; z-index: 5000;
+    background: rgba(255,255,255,0.9);
     color: #1c1a18;
-    padding: 8px 14px;
-    border-radius: 8px;
+    padding: 3px 8px;
+    border-radius: 4px;
     font-family: var(--font);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    font-size: 9px;
+    line-height: 1.4;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
   }
-  #print-header strong { display: block; font-size: 14px; font-weight: 700; }
-  #print-header .print-meta { display: block; margin-top: 2px; font-size: 10px; font-family: var(--mono); opacity: 0.75; }
+  #print-header strong { font-weight: 700; font-size: 9px; }
+  #print-header .print-meta { margin-left: 6px; font-family: var(--mono); font-size: 7px; opacity: 0.7; }
+
+  #print-north-arrow {
+    display: block !important;
+    position: absolute; bottom: 14px; left: 314px; z-index: 5000;
+    width: 22px; height: 22px;
+  }
+
+  .leaflet-control-scale {
+    bottom: 16px !important; left: 346px !important;
+  }
+  .leaflet-control-scale-line {
+    background: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    border-top: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: #fff !important;
+    height: auto !important;
+    line-height: normal !important;
+    padding: 0 8px !important;
+  }
+  .leaflet-control-scale-line::before,
+  .leaflet-control-scale-line::after {
+    background: #fff !important;
+    top: 2px; bottom: 2px;
+  }
 }
 
 </style>
@@ -1307,6 +1343,14 @@ body.bm-maps .bm-btn.active {
       <text x="19" y="6" text-anchor="middle" dominant-baseline="auto"
         font-family="IBM Plex Mono, monospace" font-size="5.5" font-weight="600"
         fill="#f5f3f0" letter-spacing="0.05em">N</text>
+    </svg>
+  </div>
+  <!-- Print-only north arrow: plain white lines, no fills/chrome -->
+  <div id="print-north-arrow">
+    <svg viewBox="0 0 24 26" xmlns="http://www.w3.org/2000/svg">
+      <line x1="12" y1="21" x2="12" y2="5" stroke="#fff" stroke-width="1.4"/>
+      <path d="M7.5 10 L12 5 L16.5 10" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="12" y="25" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="7" fill="#fff">N</text>
     </svg>
   </div>
 </div>
