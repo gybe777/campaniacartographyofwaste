@@ -868,7 +868,7 @@ body {
 #sidebar {
   position: absolute; top: 74px; left: 12px; width: 280px;
   height: auto;
-  max-height: calc(100vh - 74px - 190px);
+  max-height: calc(100vh - 74px - 220px);
   z-index: 1200;
   background: rgba(30,28,26,0.45);
   backdrop-filter: blur(26px) saturate(170%);
@@ -890,7 +890,7 @@ body {
 #info-panel {
   position: absolute; top: 74px; left: 12px; right: auto; width: 280px;
   height: auto;
-  max-height: calc(100vh - 74px - 190px);
+  max-height: calc(100vh - 74px - 220px);
   z-index: 1200;
   background: rgba(30,28,26,0.45);
   backdrop-filter: blur(26px) saturate(170%);
@@ -966,7 +966,7 @@ body {
    .leaflet-control-scale container, never on the text-bearing -line element itself — text
    rendered directly on a backdrop-filter layer shows a faint ghosted double in Chromium. */
 .leaflet-control-scale {
-  margin: 0 !important; position: absolute !important; bottom: 102px !important; left: 172px !important;
+  margin: 0 !important; position: absolute !important; bottom: 117px !important; left: 212px !important;
   background: rgba(255,255,255,0.12) !important;
   backdrop-filter: blur(16px) saturate(170%);
   -webkit-backdrop-filter: blur(16px) saturate(170%);
@@ -1512,7 +1512,7 @@ try {
   const miniTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',{attribution:'',maxZoom:19,maxNativeZoom:8});
   new L.Control.MiniMap(miniTile,{
     position:'bottomleft',
-    width:150, height:110,
+    width:190, height:140,
     zoomLevelOffset:-5,
     toggleDisplay:false,
     minimized:false,
