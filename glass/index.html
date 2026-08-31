@@ -961,28 +961,41 @@ body {
 .bm-btn { border-right: none !important; border-radius: 999px; color: rgba(255,255,255,0.75); min-height: 28px; }
 .bm-btn.active { background: rgba(255,255,255,0.92) !important; color: #1c1a18 !important; }
 
-/* Scale sits to the right of the minimap, styled as an actual graduated ruler (end-ticks), not a bare number */
-.leaflet-control-scale { margin: 0 !important; position: absolute !important; bottom: 64px !important; left: 172px !important; }
-.leaflet-control-scale-line {
+/* Scale sits to the right of the minimap, vertically centered on it, styled as an actual
+   graduated ruler (end-ticks), not a bare number. The glass/blur chrome lives on the OUTER
+   .leaflet-control-scale container, never on the text-bearing -line element itself — text
+   rendered directly on a backdrop-filter layer shows a faint ghosted double in Chromium. */
+.leaflet-control-scale {
   position: relative;
+  margin: 0 !important; position: absolute !important; bottom: 102px !important; left: 172px !important;
   background: rgba(255,255,255,0.12) !important;
   backdrop-filter: blur(16px) saturate(170%);
   -webkit-backdrop-filter: blur(16px) saturate(170%);
   border: 1px solid rgba(255,255,255,0.22) !important;
-  border-top: 1px solid rgba(255,255,255,0.22) !important;
   border-radius: 8px !important;
-  color: var(--white) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.25) !important;
   box-sizing: border-box;
   min-width: 60px;
   height: 34px !important;
-  line-height: 32px !important;
   padding: 0 14px !important;
-  display: flex; align-items: center; justify-content: center;
+  display: flex !important; align-items: center; justify-content: center;
 }
-/* End-ticks: the box width == the real ground distance in px, so these mark the measured span like a ruler */
-.leaflet-control-scale-line::before,
-.leaflet-control-scale-line::after {
+.leaflet-control-scale-line {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  color: var(--white) !important;
+  box-shadow: none !important;
+  box-sizing: border-box;
+  height: auto !important;
+  line-height: normal !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+/* End-ticks: on the outer (unblurred-text) container, spanning its height like a ruler's edges */
+.leaflet-control-scale::before,
+.leaflet-control-scale::after {
   content: '';
   position: absolute;
   top: 5px; bottom: 5px;
@@ -990,8 +1003,8 @@ body {
   background: rgba(255,255,255,0.85);
   border-radius: 1px;
 }
-.leaflet-control-scale-line::before { left: 3px; }
-.leaflet-control-scale-line::after { right: 3px; }
+.leaflet-control-scale::before { left: 3px; }
+.leaflet-control-scale::after { right: 3px; }
 
 /* ── MINIMAP: bottom-left locator, FA "Cartography of Genocide"-style compact glass box ── */
 .leaflet-control-minimap {
@@ -1065,7 +1078,7 @@ body.bm-maps #print-btn,
 body.bm-maps .hdr-logo,
 body.bm-maps #bm-ctrl,
 body.bm-maps #north-arrow,
-body.bm-maps .leaflet-control-scale-line,
+body.bm-maps .leaflet-control-scale,
 body.bm-maps .leaflet-control-minimap,
 body.bm-maps .leaflet-control-zoom a,
 body.bm-maps .maplibregl-ctrl-top-right button {
@@ -1124,22 +1137,22 @@ body.bm-maps .bm-btn.active {
 
   .leaflet-control-scale {
     bottom: 16px !important; left: 46px !important;
-  }
-  .leaflet-control-scale-line {
     background: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     border: none !important;
-    border-top: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
+    height: auto !important;
+    padding: 0 8px !important;
+  }
+  .leaflet-control-scale-line {
     color: #fff !important;
     height: auto !important;
     line-height: normal !important;
-    padding: 0 8px !important;
   }
-  .leaflet-control-scale-line::before,
-  .leaflet-control-scale-line::after {
+  .leaflet-control-scale::before,
+  .leaflet-control-scale::after {
     background: #fff !important;
     top: 2px; bottom: 2px;
   }
