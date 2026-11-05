@@ -659,6 +659,8 @@ body {
   width: 100%; height: 100%;
 }
 #map3d { display: none; }
+/* Greyscale satellite basemap */
+.leaflet-layer.bm-grey { filter: grayscale(1) contrast(1.25) brightness(1.05); }
 /* Basemap control */
 #bm-ctrl {
   position: absolute; bottom: 10px; right: 54px; z-index: 1000;
@@ -1423,6 +1425,7 @@ body.bm-maps .bm-btn.active {
   <div id="rotate-hint" data-i18n="rotate_hint">Drag to pan &nbsp;·&nbsp; Right-click drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
   <div id="bm-ctrl">
     <button class="bm-btn active" id="bm-sat"   onclick="setBasemap('sat')">SAT</button>
+    <button class="bm-btn" id="bm-grey"  onclick="setBasemap('grey')">GREY</button>
     <button class="bm-btn" id="bm-dark"  onclick="setBasemap('dark')">DARK</button>
     <button class="bm-btn" id="bm-maps"  onclick="setBasemap('maps')">MAPS</button>
   </div>
@@ -2282,11 +2285,18 @@ map.fitBounds(ARPAC25.concat(SVERSAMENTI).map(s=>[s.lat,s.lon]),{padding:[40,40]
 const mapsTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
   {attribution:'© Esri', maxZoom:19});
 
+// Greyscale satellite: same Esri imagery, desaturated + contrast-boosted via CSS (.bm-grey)
+const satGrey = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  {attribution:'© Esri', maxZoom:19, className:'bm-grey'});
+
 let currentBM = satellite;
 let currentBMKey = 'sat';
-const bmLayers = {sat: satellite, dark: cartoDark, maps: mapsTiles};
+const bmLayers = {sat: satellite, grey: satGrey, dark: cartoDark, maps: mapsTiles};
+// 3D (MapLibre) equivalent of the greyscale CSS filter
+const bmPaint3d = k => k === 'grey' ? {'raster-saturation': -1, 'raster-contrast': 0.25} : {};
 const bmTiles3d = {
   sat:   ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+  grey:  ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
   dark:  ['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'],
   maps:  ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}']
 };
@@ -2313,7 +2323,7 @@ function swap3DBasemap(key) {
     });
     const firstData = ['comuni-fill','part-fill','shp-fill','parc-fill','beni-pts','conf-clusters','sites-pts']
       .find(id => { try { return !!glMap.getLayer(id); } catch(e){ return false; } });
-    glMap.addLayer({id:'base', type:'raster', source:'carto'}, firstData);
+    glMap.addLayer({id:'base', type:'raster', source:'carto', paint: bmPaint3d(key)}, firstData);
   } catch(e) { console.warn('3D basemap swap:', e); }
 }
 
@@ -2743,7 +2753,7 @@ function init3D() {
         encoding: 'terrarium', tileSize: 256, maxzoom: 14
       }
     },
-    layers: [{ id: 'base', type: 'raster', source: 'carto' }],
+    layers: [{ id: 'base', type: 'raster', source: 'carto', paint: bmPaint3d(currentBMKey) }],
     glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf'
   };
 
