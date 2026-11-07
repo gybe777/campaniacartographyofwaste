@@ -1543,7 +1543,7 @@ const I18N = {
     p_sver:'Sversamento Abusivo', p_indirizzo:'Indirizzo', p_data:'Data identificazione', p_link:'Scheda sito ↗',
     toggle_show:'Mostra sulla mappa',
     yes:'SÌ', no:'NO',
-    more_results:'altri risultati',
+    more_results:'altri risultati', search_hint:'Scrivi almeno 2 lettere: nome del sito, comune, indirizzo, contaminante…', no_results:'Nessun risultato', s_comune:'Comune',
     cat_ind:'Industriale / Produttivo', cat_carb:'Carburanti / Idrocarburi',
     cat_rif:'Rifiuti / Discariche', cat_amb:'Ambientale / Agricolo',
     cat_dis:'Dismesso / Ex-Industriale',
@@ -1630,7 +1630,7 @@ const I18N = {
     p_sver:'Illegal Dumping Site', p_indirizzo:'Address', p_data:'Identification date', p_link:'Site record ↗',
     toggle_show:'Show on map',
     yes:'YES', no:'NO',
-    more_results:'more results',
+    more_results:'more results', search_hint:'Type at least 2 letters: site name, municipality, address, contaminant…', no_results:'No results', s_comune:'Municipality',
     cat_ind:'Industrial / Productive', cat_carb:'Fuel / Hydrocarbons',
     cat_rif:'Waste / Landfills', cat_amb:'Environmental / Agricultural',
     cat_dis:'Decommissioned / Former Industrial',
@@ -2119,8 +2119,44 @@ function applyFilters() {
   renderList();
 }
 
+// Search index across the layers currently on the map
+// (the old search only covered the ARPAC 2018 list, which is now empty)
+function normTxt(t){return String(t==null?'':t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function propsTxt(o){return normTxt(Object.values(o||{}).filter(v=>v!=null&&typeof v!=='object').join(' | '));}
+const SEARCH_IDX=[];
+ARPAC25.forEach(x=>SEARCH_IDX.push({col:'#C8202F',lat:x.lat,lon:x.lon,
+  title:()=>x.props.denominazione||T('a25_'+x.c),cat:()=>T('a25_'+x.c),comune:x.props.comune,
+  txt:propsTxt(x.props)+' '+normTxt(T('a25_'+x.c)),popup:()=>a25PopupHTML(x.props,x.c)}));
+AGRI25.forEach(x=>SEARCH_IDX.push({col:'#E07B00',lat:x.lat,lon:x.lon,
+  title:()=>x.props.denominazione||T('layer_agr25'),cat:()=>T('layer_agr25'),comune:x.props.comune,
+  txt:propsTxt(x.props),popup:()=>a25PopupHTML(x.props,'agr')}));
+CONF.forEach(c=>SEARCH_IDX.push({col:'#2E7D32',lat:c.lat,lon:c.lon,
+  title:()=>c.props.nome||T('p_conf'),cat:()=>T('p_conf'),comune:c.props.comune,
+  txt:propsTxt(c.props)+' '+normTxt(T('p_conf')),popup:()=>confPopupHTML(c.props)}));
+PARC.features.forEach(f=>SEARCH_IDX.push({col:'#4CAF50',feat:f,
+  title:()=>T('p_parc')+(f.properties.fogl_part?' '+f.properties.fogl_part:''),cat:()=>T('p_parc'),comune:f.properties.comune,
+  txt:propsTxt(f.properties)+' '+normTxt(T('p_parc')),popup:()=>parcPopupHTML(f.properties)}));
+CLASSED.features.forEach(f=>SEARCH_IDX.push({col:'#8E24AA',feat:f,
+  title:()=>T('p_classed')+' · Fg. '+f.properties.foglio+' p.lla '+f.properties.part_lla,cat:()=>T('p_classed'),comune:f.properties.comune,
+  txt:propsTxt(f.properties)+' '+normTxt(T('p_classed')),popup:()=>classedPopupHTML(f.properties)}));
+SVERSAMENTI.forEach(v=>SEARCH_IDX.push({col:'#5D4037',lat:v.lat,lon:v.lon,
+  title:()=>T('p_sver')+(v.props.indirizzo?' · '+v.props.indirizzo:''),cat:()=>T('p_sver'),comune:v.props.comune,
+  txt:propsTxt(v.props)+' '+normTxt(T('p_sver')),popup:()=>sverPopupHTML(v)}));
+COMUNI.forEach(c=>{ if(!c.props||!c.props.comune) return; SEARCH_IDX.push({col:'#9E9E9E',rings:c.rings,
+  title:()=>c.props.comune,cat:()=>T('s_comune'),comune:c.props.sigla_pro||'',
+  txt:normTxt(c.props.comune),popup:()=>comuniPopupHTML(c),isComune:true}); });
+
+let searchHits=[];
+function runSearch(){
+  const nq=normTxt(q).trim();
+  if(nq.length<2){ searchHits=[]; return; }
+  const terms=nq.split(/\s+/);
+  searchHits=SEARCH_IDX.filter(it=>terms.every(t=>it.txt.includes(t)));
+  // municipalities first, then by name match
+  searchHits.sort((a,b)=>(b.isComune?1:0)-(a.isComune?1:0));
+}
 document.getElementById('search').addEventListener('input',function(){
-  q=this.value.toLowerCase(); applyFilters();
+  q=this.value; runSearch(); renderList();
 });
 
 // ── SITE POPUP HELPER ──
@@ -2235,31 +2271,39 @@ function classedPopupHTML(p){
     +'</div>';
 }
 
-// ── SITE LIST ──
+// ── SITE LIST (search results) ──
 function renderList() {
   const el=document.getElementById('site-list');
-  const toShow=Array.from(filtIdx).slice(0,120);
-  el.innerHTML=toShow.map(i=>{
-    const s=SITES[i],col=getColor(s['Site Type']);
-    return '<div class="si" onclick="fly('+i+')">'
-      +'<div class="si-name">'+s.Name+'</div>'
-      +'<div class="si-meta"><div class="si-bar" style="background:'+col+'"></div>'
-      +String(s.Municipality||'—').toUpperCase()+' · '+catName(getCat(s['Site Type']))+'</div>'
-      +'</div>';
-  }).join('');
-  if(filtIdx.size>120) el.innerHTML+='<div class="si" style="color:var(--gray2);cursor:default">+ '+(filtIdx.size-120)+' '+T('more_results')+'</div>';
+  if(normTxt(q).trim().length<2){ el.innerHTML='<div class="si" style="color:var(--gray2);cursor:default">'+T('search_hint')+'</div>'; return; }
+  if(!searchHits.length){ el.innerHTML='<div class="si" style="color:var(--gray2);cursor:default">'+T('no_results')+'</div>'; return; }
+  const MAX=150;
+  el.innerHTML=searchHits.slice(0,MAX).map((it,k)=>'<div class="si" onclick="fly('+k+')">'
+      +'<div class="si-name">'+esc(it.title())+'</div>'
+      +'<div class="si-meta"><div class="si-bar" style="background:'+it.col+'"></div>'
+      +esc(String(it.comune||'—').toUpperCase())+' · '+esc(it.cat())+'</div>'
+      +'</div>').join('')
+    +(searchHits.length>MAX?'<div class="si" style="color:var(--gray2);cursor:default">+ '+(searchHits.length-MAX)+' '+T('more_results')+'</div>':'');
 }
 
-function fly(i) {
-  const s=SITES[i];
-  map.flyTo([s.lat,s.lon],15,{duration:0.8});
-  setTimeout(()=>mByIdx.get(i)?.openPopup(),700);
+function fly(k) {
+  const it=searchHits[k]; if(!it) return;
+  let center;
+  map.closePopup();
+  if(it.feat||it.rings){
+    const b=it.feat?L.geoJSON(it.feat).getBounds():L.polygon(it.rings).getBounds();
+    center=b.getCenter();
+    map.flyToBounds(b,{maxZoom:it.isComune?13:17,duration:0.8,padding:[40,40]});
+  } else {
+    center=L.latLng(it.lat,it.lon);
+    map.flyTo(center,16,{duration:0.8});
+  }
+  map.once('moveend',()=>L.popup({maxWidth:320,autoPanPadding:[60,90]}).setLatLng(center).setContent(it.popup()).openOn(map));
 }
 
 // ── RESET ──
 function resetAll() {
   hiddenCats.clear();
-  q='';
+  q=''; searchHits=[];
   document.getElementById('search').value='';
   document.querySelectorAll('.sub-row.off').forEach(r=>r.classList.remove('off'));
   // reset layer visibility
