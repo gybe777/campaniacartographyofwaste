@@ -1576,7 +1576,7 @@ const I18N = {
     desc_scr:'Gli stessi terreni confiscati, classificati per vicinanza a fonti di possibile contaminazione: siti contaminati o potenzialmente contaminati ARPAC (Piano di Bonifica 2025), particelle classe D e Terra dei Fuochi, sversamenti DPCM 2025. L’alone segna i 150 m intorno a ogni terreno; la linea tratteggiata collega il terreno alla fonte più vicina entro 1 km, con la distanza. È uno screening di prossimità: la vicinanza non prova la contaminazione, e l’assenza di siti noti non significa terreno bonificato. Si alterna al layer Terreni Confiscati.',
     scr_ver:'Da verificare: siti critici entro 150 m', scr_ok:'Nessun sito critico noto entro 150 m', scr_vag:'Posizione non verificabile (solo comune)',
     p_esito:'Esito screening', p_near:'Fonte più vicina', p_entro150:'Entro 150 m', p_arpac_near:'Sito ARPAC più vicino', p_svers_near:'Sversamento più vicino', p_classed_near:'Particella classe D più vicina', p_tdf_near:'Particella Terra dei Fuochi più vicina', p_bene:'Il terreno',
-    t_arpac:'sito ARPAC', t_svers:'sversamento DPCM', t_classed:'particella classe D', t_tdf:'particella Terra dei Fuochi', w_none:'nessuno',
+    t_arpac:'sito ARPAC', t_svers:'sversamento DPCM', t_classed:'particella classe D', t_tdf:'particella Terra dei Fuochi', t_arpac_pl:'siti ARPAC', t_svers_pl:'sversamenti DPCM', t_classed_pl:'particelle classe D', t_tdf_pl:'particelle Terra dei Fuochi', w_none:'nessuno', sv_st_rem:'Rimosso', sv_st_not:'Non rimosso', nd:'n.d.',
     scr_note:'Screening di prossimità su dati ARPAC, DPCM 14.03.2025 e decreti Terra dei Fuochi. La vicinanza non prova la contaminazione del terreno; molte posizioni sono approssimate.',
     desc_conf:'Terreni confiscati alla criminalità organizzata: registro ANBSC dei beni destinati, elenchi comunali (art. 48) con catasto e rilievi di campo. Molti punti sono localizzati solo a livello di comune.',
     layer_polis:'Beni Agricoli Confiscati — Pol.i.s.',
@@ -1669,7 +1669,7 @@ const I18N = {
     desc_scr:'The same confiscated land, classified by proximity to possible sources of contamination: ARPAC contaminated or potentially contaminated sites (2025 Remediation Plan), class D and Terra dei Fuochi parcels, and 2025 illegal dumping sites. The halo marks 150 m around each plot; the dashed line links the plot to the nearest source within 1 km, with its distance. This is a proximity screening: being close does not prove contamination, and no known site nearby does not mean the land has been remediated. Alternates with the Confiscated Land layer.',
     scr_ver:'To check: critical sites within 150 m', scr_ok:'No known critical site within 150 m', scr_vag:'Location cannot be checked (municipality only)',
     p_esito:'Screening result', p_near:'Nearest source', p_entro150:'Within 150 m', p_arpac_near:'Nearest ARPAC site', p_svers_near:'Nearest dumping site', p_classed_near:'Nearest class D parcel', p_tdf_near:'Nearest Terra dei Fuochi parcel', p_bene:'The land',
-    t_arpac:'ARPAC site', t_svers:'dumping site (DPCM)', t_classed:'class D parcel', t_tdf:'Terra dei Fuochi parcel', w_none:'none',
+    t_arpac:'ARPAC site', t_svers:'dumping site (DPCM)', t_classed:'class D parcel', t_tdf:'Terra dei Fuochi parcel', t_arpac_pl:'ARPAC sites', t_svers_pl:'dumping sites (DPCM)', t_classed_pl:'class D parcels', t_tdf_pl:'Terra dei Fuochi parcels', w_none:'none', sv_st_rem:'Removed', sv_st_not:'Not removed', nd:'n/a',
     scr_note:'Proximity screening on ARPAC, DPCM 14.03.2025 and Terra dei Fuochi decree data. Proximity does not prove the land is contaminated; many locations are approximate.',
     desc_conf:'Land confiscated from organised crime: ANBSC register of assigned assets, municipal lists (art. 48) matched to the cadastre, and field survey. Many points are located only at municipality level.',
     layer_polis:'Confiscated Agricultural Assets — Pol.i.s.',
@@ -2292,19 +2292,33 @@ function confPopupHTML(p){
     +'</div>';
 }
 function fmtM(m){return Number(m).toLocaleString(LANG==='en'?'en-GB':'it-IT')+' m';}
+function tdfRifiuti(v){
+  const r=String(v||'').replace(/^[\s\S]*rifiuti:\s*/i,'').trim();
+  if(/^no$/i.test(r)) return T('no');
+  if(/^si$/i.test(r)) return T('yes');
+  if(!r||/^n\.d\.$/i.test(r)) return T('nd');
+  return r;
+}
+function scrNearName(x){
+  if(x.near_tipo==='tdf') return T('p_particella')+' — '+T('p_rifiuti')+': '+tdfRifiuti(x.near_nome);
+  return x.near_nome;
+}
+function scrArpacStato(v){ return String(v||'').trim().toLowerCase().startsWith('contaminato')?T('a25_st_cont'):T('a25_st_pot'); }
+function scrSversStato(v){ return /^\s*non\b/i.test(String(v||''))?T('sv_st_not'):T('sv_st_rem'); }
 function scrPopupHTML(p,x){
   const within=[];
-  if(x.n_arpac) within.push(x.n_arpac+' '+T('t_arpac'));
-  if(x.n_svers) within.push(x.n_svers+' '+T('t_svers'));
-  if(x.n_classed) within.push(x.n_classed+' '+T('t_classed'));
-  if(x.n_tdf) within.push(x.n_tdf+' '+T('t_tdf'));
+  const cnt=(n,k)=>n+' '+T(n===1?'t_'+k:'t_'+k+'_pl');
+  if(x.n_arpac) within.push(cnt(x.n_arpac,'arpac'));
+  if(x.n_svers) within.push(cnt(x.n_svers,'svers'));
+  if(x.n_classed) within.push(cnt(x.n_classed,'classed'));
+  if(x.n_tdf) within.push(cnt(x.n_tdf,'tdf'));
   return '<div class="popup-wrap"><div class="popup-title">'+esc(p.nome||T('p_conf'))+'</div>'
     +'<div class="popup-badge" style="background:'+SCR_COL[x.scr]+'">'+esc(T('scr_'+x.scr))+'</div>'
     +pRow(T('p_near'),T('t_'+x.near_tipo)+' · '+fmtM(x.near_m))
-    +pRow('',x.near_nome)
+    +pRow('',scrNearName(x))
     +(x.scr!=='vag'?pRow(T('p_entro150'),within.length?within.join(', '):T('w_none')):'')
-    +pRow(T('p_arpac_near'),(x.arpac_nome||'')+' — '+(x.arpac_stato||'')+' · '+fmtM(x.arpac_m))
-    +pRow(T('p_svers_near'),fmtM(x.svers_m)+(x.svers_stato?' · '+x.svers_stato:''))
+    +pRow(T('p_arpac_near'),(x.arpac_nome||'')+(x.arpac_stato?' — '+scrArpacStato(x.arpac_stato):'')+' · '+fmtM(x.arpac_m))
+    +pRow(T('p_svers_near'),fmtM(x.svers_m)+(x.svers_stato?' · '+scrSversStato(x.svers_stato):''))
     +pRow(T('p_classed_near'),fmtM(x.classed_m))
     +pRow(T('p_tdf_near'),fmtM(x.tdf_m))
     +'<div class="popup-sub">'+T('p_bene')+'</div>'
