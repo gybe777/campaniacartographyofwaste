@@ -1578,7 +1578,7 @@ const I18N = {
     p_esito:'Esito screening', p_near:'Fonte più vicina', p_entro150:'Entro 150 m', p_arpac_near:'Sito ARPAC più vicino', p_svers_near:'Sversamento più vicino', p_classed_near:'Particella classe D più vicina', p_tdf_near:'Particella Terra dei Fuochi più vicina', p_bene:'Il terreno',
     t_arpac:'sito ARPAC', t_svers:'sversamento DPCM', t_classed:'particella classe D', t_tdf:'particella Terra dei Fuochi', t_arpac_pl:'siti ARPAC', t_svers_pl:'sversamenti DPCM', t_classed_pl:'particelle classe D', t_tdf_pl:'particelle Terra dei Fuochi', w_none:'nessuno', sv_st_rem:'Rimosso', sv_st_not:'Non rimosso', nd:'n.d.',
     scr_note:'Screening di prossimità su dati ARPAC, DPCM 14.03.2025 e decreti Terra dei Fuochi. La vicinanza non prova la contaminazione del terreno; molte posizioni sono approssimate.',
-    desc_conf:'Terreni confiscati alla criminalità organizzata: registro ANBSC dei beni destinati, elenchi comunali (art. 48) con catasto e rilievi di campo. Molti punti sono localizzati solo a livello di comune.',
+    desc_conf:'Terreni confiscati alla criminalità organizzata. Fonti: registro ANBSC dei beni destinati, elenchi comunali (art. 48) con catasto, rilievi di campo. «Destinato» significa che l’ANBSC ha emesso il decreto di destinazione, di solito a favore del Comune: non vuol dire che il terreno sia già affidato a qualcuno o in uso. Molti punti sono localizzati solo a livello di comune.',
     layer_polis:'Beni Agricoli Confiscati — Pol.i.s.',
     desc_polis:'Terreni agricoli confiscati e riutilizzati a fini sociali, dalle schede della Fondazione Pol.i.s. — Regione Campania.',
     layer_parc:'Particelle Confiscate',
@@ -1615,8 +1615,8 @@ const I18N = {
     desc_parc:'Particelle catastali note di terreni confiscati, dagli elenchi comunali dei beni confiscati (art. 48 c.3 lett. c).',
     sver_on:'Non rimossi', sver_off:'Rimossi',
     p_conf:'Terreno Confiscato', p_polis:'Bene Agricolo Confiscato (Pol.i.s.)', p_parc:'Particella Confiscata',
-    p_foglio:'Foglio:particella', p_gestore:'Gestore', p_uso:'Utilizzo', p_ettari:'Ettari', p_fonte:'Fonte',
-    p_precisione:'Localizzazione', p_destinaz:'Destinazione', p_ente:'Ente', p_scheda:'Scheda Pol.i.s. ↗',
+    p_foglio:'Foglio:particella', p_gestore:'Destinatario / gestore', p_uso:'Utilizzo', p_ettari:'Ettari', p_fonte:'Fonte', src_anbsc:'Registro ANBSC — bene destinato (decreto di destinazione; non necessariamente affidato o in uso)', src_art48:'Elenco comunale dei beni confiscati (art. 48) + catasto', src_field:'Rilievo di campo',
+    p_precisione:'Localizzazione', p_destinaz:'Destinazione (da decreto)', p_ente:'Ente', p_scheda:'Scheda Pol.i.s. ↗',
     pos_comune:'solo comune (approssimata)', pos_loc:'località (approssimata)', pos_street:'via', pos_parcel:'particella esatta', pos_point:'punto rilevato',
   },
   en: {
@@ -1671,7 +1671,7 @@ const I18N = {
     p_esito:'Screening result', p_near:'Nearest source', p_entro150:'Within 150 m', p_arpac_near:'Nearest ARPAC site', p_svers_near:'Nearest dumping site', p_classed_near:'Nearest class D parcel', p_tdf_near:'Nearest Terra dei Fuochi parcel', p_bene:'The land',
     t_arpac:'ARPAC site', t_svers:'dumping site (DPCM)', t_classed:'class D parcel', t_tdf:'Terra dei Fuochi parcel', t_arpac_pl:'ARPAC sites', t_svers_pl:'dumping sites (DPCM)', t_classed_pl:'class D parcels', t_tdf_pl:'Terra dei Fuochi parcels', w_none:'none', sv_st_rem:'Removed', sv_st_not:'Not removed', nd:'n/a',
     scr_note:'Proximity screening on ARPAC, DPCM 14.03.2025 and Terra dei Fuochi decree data. Proximity does not prove the land is contaminated; many locations are approximate.',
-    desc_conf:'Land confiscated from organised crime: ANBSC register of assigned assets, municipal lists (art. 48) matched to the cadastre, and field survey. Many points are located only at municipality level.',
+    desc_conf:'Land confiscated from organised crime. Sources: ANBSC register of allocated assets, municipal lists (art. 48) matched to the cadastre, field survey. “Allocated” (destinato) means ANBSC has issued a destination decree, usually to the municipality: it does not mean the land has been handed over to anyone or is in use. Many points are located only at municipality level.',
     layer_polis:'Confiscated Agricultural Assets — Pol.i.s.',
     desc_polis:'Confiscated agricultural land reused for social purposes, from the Pol.i.s. Foundation records — Campania Region.',
     layer_parc:'Confiscated Parcels',
@@ -1708,8 +1708,8 @@ const I18N = {
     desc_parc:'Known cadastral parcels of confiscated land, from municipal lists of confiscated assets (art. 48 c.3 lett. c).',
     sver_on:'Not removed', sver_off:'Removed',
     p_conf:'Confiscated Land', p_polis:'Confiscated Agricultural Asset (Pol.i.s.)', p_parc:'Confiscated Parcel',
-    p_foglio:'Sheet:parcel', p_gestore:'Manager', p_uso:'Use', p_ettari:'Hectares', p_fonte:'Source',
-    p_precisione:'Location', p_destinaz:'Destination', p_ente:'Body', p_scheda:'Pol.i.s. record ↗',
+    p_foglio:'Sheet:parcel', p_gestore:'Recipient / manager', p_uso:'Use', p_ettari:'Hectares', p_fonte:'Source', src_anbsc:'ANBSC register — allocated by destination decree (not necessarily handed over or in use)', src_art48:'Municipal list of confiscated assets (art. 48) + cadastre', src_field:'Field survey',
+    p_precisione:'Location', p_destinaz:'Intended use (per decree)', p_ente:'Body', p_scheda:'Pol.i.s. record ↗',
     pos_comune:'municipality only (approx.)', pos_loc:'locality (approx.)', pos_street:'street', pos_parcel:'exact parcel', pos_point:'surveyed point',
   }
 };
@@ -2277,6 +2277,8 @@ function particellePopupHTML(p){
 
 function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function pRow(label,val){return (val===undefined||val===null||val==='')?'':'<div class="popup-row"><span class="popup-label">'+label+'</span><span>'+esc(val)+'</span></div>';}
+const SRC_KEY={'ANBSC register (assigned land)':'src_anbsc','Comune list (art. 48) + cadastre':'src_art48','Your list (beni_agricoli.xlsx)':'src_field'};
+function srcTxt(v){return v?T(SRC_KEY[v]||v):'';}
 const POS_KEY={'Comune only':'pos_comune','Locality (approx.)':'pos_loc','Street':'pos_street','Exact parcel':'pos_parcel','Your point':'pos_point'};
 function confPopupHTML(p){
   return '<div class="popup-wrap"><div class="popup-title">'+esc(p.nome||T('p_conf'))+'</div>'
@@ -2288,7 +2290,7 @@ function confPopupHTML(p){
     +pRow(T('p_gestore'),p.gestore)
     +pRow(T('p_uso'),p.uso)
     +pRow(T('p_precisione'),p.posizione?T(POS_KEY[p.posizione]||p.posizione):'')
-    +pRow(T('p_fonte'),p.fonte)
+    +pRow(T('p_fonte'),srcTxt(p.fonte))
     +'</div>';
 }
 function fmtM(m){return Number(m).toLocaleString(LANG==='en'?'en-GB':'it-IT')+' m';}
@@ -2329,7 +2331,7 @@ function scrPopupHTML(p,x){
     +pRow(T('p_gestore'),p.gestore)
     +pRow(T('p_uso'),p.uso)
     +pRow(T('p_precisione'),p.posizione?T(POS_KEY[p.posizione]||p.posizione):'')
-    +pRow(T('p_fonte'),p.fonte)
+    +pRow(T('p_fonte'),srcTxt(p.fonte))
     +'<div class="popup-note">'+T('scr_note')+'</div>'
     +'</div>';
 }
@@ -2352,7 +2354,7 @@ function parcPopupHTML(p){
     +pRow(T('p_destinaz'),p.destinaz)
     +pRow(T('p_uso'),p.utilizzo)
     +pRow(T('p_gestore'),p.concess)
-    +pRow(T('p_fonte'),p.fonte)
+    +pRow(T('p_fonte'),srcTxt(p.fonte))
     +'</div>';
 }
 
