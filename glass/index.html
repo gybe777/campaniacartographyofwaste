@@ -1204,6 +1204,62 @@ html.embed.embed-locked #embed-tap {
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.25); color: #fff; font: 600 11px/1 var(--mono, monospace); letter-spacing: 0.06em;
 }
+
+/* ── PHONE LAYOUT (≤768px): one compact header row, panels full-width, controls stacked above the footer ── */
+body { height: 100vh; height: 100dvh; }
+@media (max-width: 768px) {
+  #hdr-logo-btn { top: calc(10px + env(safe-area-inset-top)); left: 10px; width: 44px; height: 44px; font-size: 12px; }
+  #header { top: calc(10px + env(safe-area-inset-top)); left: 62px; right: 10px; height: 44px; gap: 6px; }
+  .hdr-island { height: 44px; border-radius: 22px; }
+  .hdr-island-title { display: none; }
+  .hdr-island-tabs { flex: 1; min-width: 0; padding: 4px; }
+  .hdr-tabs { height: 36px; width: 100%; }
+  .hdr-tab { flex: 1; padding: 0 8px; font-size: 13px; }
+  .hdr-island-actions { gap: 5px; padding: 0 4px; }
+  .btn-3d { width: 36px !important; height: 36px !important; padding: 0 !important; font-size: 11px !important; letter-spacing: 0.02em !important; }
+  #print-btn { display: none !important; }
+  #btn-readme { font-size: 0 !important; }
+  #btn-readme::before { content: 'i'; font-family: Georgia, serif; font-style: italic; font-weight: 700; font-size: 16px; }
+
+  #sidebar, #info-panel, #readme-panel {
+    top: calc(62px + env(safe-area-inset-top)); left: 10px; right: 10px; width: auto !important;
+    max-height: calc(100vh - 124px); max-height: calc(100dvh - 124px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    border-radius: 18px;
+  }
+  #sidebar.collapsed, #info-panel.collapsed, #readme-panel.collapsed { width: auto !important; transform: translateY(-8px); }
+  .layer-row { padding: 14px 16px; }
+  .layer-toggle-row { padding: 12px 16px; }
+  .sub-row { padding: 11px 16px 11px 28px; }
+  .si { padding: 12px 16px; }
+  #search { font-size: 16px; padding: 10px 12px; } /* 16px stops iOS zooming in on focus */
+  .info-section { padding: 14px 16px; }
+  .info-close { font-size: 22px; padding: 4px 6px; }
+
+  #statusbar { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); height: 36px; padding: 0 14px; gap: 10px; border-radius: 18px; overflow: hidden; }
+  #sb-hover { min-width: 0; }
+  #statusbar .hdr-count { padding: 0; font-size: 10px; flex-shrink: 0; white-space: nowrap; }
+  #statusbar .hdr-count [data-i18n="hdr_visible"] { display: none; }
+  #sb-attrib { font-size: 9px; flex-shrink: 0; margin-left: 0; }
+
+  /* row 1 above the footer: basemap switcher (left) + scale (right) */
+  #bm-ctrl { bottom: calc(56px + env(safe-area-inset-bottom)) !important; left: 10px; right: auto !important; padding: 2px; }
+  .bm-btn { padding: 0 10px; min-height: 30px; font-size: 10px; }
+  .leaflet-control-scale { left: calc(100vw - 10px) !important; transform: translateX(-100%) !important; bottom: calc(56px + env(safe-area-inset-bottom)) !important; height: 34px !important; padding: 0 10px !important; }
+  /* row 2: minimap (left) + north arrow (right) */
+  .leaflet-control-minimap { bottom: calc(100px + env(safe-area-inset-bottom)) !important; left: 10px !important; border-radius: 14px !important; }
+  #north-arrow { bottom: calc(100px + env(safe-area-inset-bottom)) !important; right: 10px !important; width: 36px; height: 36px; }
+  .leaflet-control-zoom { display: none !important; } /* pinch to zoom */
+  .maplibregl-ctrl-top-right { top: calc(62px + env(safe-area-inset-top)) !important; right: 10px !important; }
+  #rotate-hint { display: none !important; }
+  .popup-inner, .popup-wrap { min-width: 0; max-width: min(300px, calc(100vw - 60px)); }
+  /* panels are more opaque on a phone so text stays readable over busy imagery */
+  #sidebar, #info-panel, #readme-panel { background: rgba(28,26,24,0.86) !important; }
+  /* while a panel is open, the map controls behind it step aside */
+  body:has(#sidebar:not(.collapsed)) .leaflet-control-minimap, body:has(#info-panel:not(.collapsed)) .leaflet-control-minimap, body:has(#readme-panel:not(.collapsed)) .leaflet-control-minimap,
+  body:has(#sidebar:not(.collapsed)) #bm-ctrl, body:has(#info-panel:not(.collapsed)) #bm-ctrl, body:has(#readme-panel:not(.collapsed)) #bm-ctrl,
+  body:has(#sidebar:not(.collapsed)) .leaflet-control-scale, body:has(#info-panel:not(.collapsed)) .leaflet-control-scale, body:has(#readme-panel:not(.collapsed)) .leaflet-control-scale,
+  body:has(#sidebar:not(.collapsed)) #north-arrow, body:has(#info-panel:not(.collapsed)) #north-arrow, body:has(#readme-panel:not(.collapsed)) #north-arrow { opacity: 0; pointer-events: none; }
+}
 </style>
 </head>
 <body>
@@ -1757,14 +1813,15 @@ const satellite  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/serv
 const cartoDark  = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19,maxNativeZoom:16});
 
 satellite.addTo(map);
-L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);
+const MOB_UI=window.matchMedia&&matchMedia('(max-width: 768px)').matches;
+L.control.scale({imperial:false,position:'bottomleft',maxWidth:MOB_UI?80:120}).addTo(map);
 
 // ── MINIMAP (bottom-left locator) ──
 try {
   const miniTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',{attribution:'',maxZoom:19,maxNativeZoom:8});
   new L.Control.MiniMap(miniTile,{
     position:'bottomleft',
-    width:190, height:140,
+    width:MOB_UI?120:190, height:MOB_UI?90:140,
     zoomLevelOffset:-5,
     toggleDisplay:false,
     minimized:false,
@@ -3046,7 +3103,7 @@ function toggleLang(){
   var root=document.documentElement; root.classList.add('embed');
   var outer=document.getElementById('map-outer');
   var en=(navigator.language||'').slice(0,2)!=='it';
-  var full=(window.matchMedia&&matchMedia('(max-width: 768px)').matches)?'mobile.html':'./';
+  var full='./';
   var a=document.createElement('a'); a.id='embed-open'; a.href=full; a.target='_blank'; a.rel='noopener';
   a.textContent=en?'OPEN THE PLATFORM ↗':'APRI LA PIATTAFORMA ↗'; outer.appendChild(a);
   var touch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
@@ -3062,6 +3119,47 @@ function toggleLang(){
     outer.addEventListener('click',function(){ map.scrollWheelZoom.enable(); },{once:true});
   }
   setTimeout(function(){ map.invalidateSize(); },300);
+})();
+</script>
+<script>
+/* ── PHONE LAYOUT helpers ── */
+(function(){
+  var mq = window.matchMedia('(max-width: 768px)');
+  var touch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  if (touch) {
+    I18N.it.sb_hover_placeholder = 'Tocca un elemento della mappa';
+    I18N.en.sb_hover_placeholder = 'Tap a map item';
+    var t = document.getElementById('sb-hover-title');
+    if (t && t.dataset.i18n === 'sb_hover_placeholder') t.textContent = T('sb_hover_placeholder');
+  }
+  // On phones the visible/total count moves from the (hidden) title island into the footer
+  var cnt = document.querySelector('.hdr-count'), home = cnt && cnt.parentNode;
+  var sb = document.getElementById('statusbar'), attrib = document.getElementById('sb-attrib');
+  function place(){
+    if (!cnt || !sb) return;
+    if (mq.matches) { if (cnt.parentNode !== sb) sb.insertBefore(cnt, attrib); attrib.textContent = '🇵🇸 © Esri'; }
+    else { if (cnt.parentNode !== home) home.appendChild(cnt); attrib.textContent = '🇵🇸 Leaflet · © Esri'; }
+  }
+  place();
+  if (mq.addEventListener) mq.addEventListener('change', place); else mq.addListener(place);
+
+  function closePanels(){
+    ['sidebar','info-panel','readme-panel'].forEach(function(id){ var e = document.getElementById(id); if (e) e.classList.add('collapsed'); });
+    document.querySelectorAll('.hdr-tab').forEach(function(t){ t.classList.remove('active'); });
+  }
+  // Tapping the map, or picking a search result, gets the panel out of the way
+  map.on('click', function(){ if (mq.matches) closePanels(); });
+  var _fly = window.fly;
+  if (typeof _fly === 'function') window.fly = function(){ if (mq.matches) closePanels(); return _fly.apply(this, arguments); };
+  // Closing the WL / README panel on a phone shouldn't pop the layer panel open
+  ['toggleInfo','toggleReadme'].forEach(function(name){
+    var orig = window[name]; if (typeof orig !== 'function') return;
+    window[name] = function(){
+      var r = orig.apply(this, arguments);
+      if (mq.matches && !document.querySelector('.hdr-tab.active')) document.getElementById('sidebar').classList.add('collapsed');
+      return r;
+    };
+  });
 })();
 </script>
 </body>
